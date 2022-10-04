@@ -60,6 +60,8 @@ class App(QWidget):
         else:
             self.edit_record_nir_form.close()
             self.edit_record_nir_form = None
+            self.open_edit_record_nir()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
