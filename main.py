@@ -3,13 +3,25 @@ import os
 from database_sqlalchemy import session
 
 from PyQt6.QtSql import QSqlTableModel, QSqlDatabase, QSqlRelationalTableModel
-from PyQt6.QtWidgets import QApplication, QWidget, QFileDialog, QTableView, QHeaderView
+from PyQt6.QtWidgets import QApplication, QWidget, QFileDialog, QTableView, QHeaderView, QMessageBox
 from form import *
 from ListClasses import VuzList
 from database_sqlalchemy import VUZ
 from PyQt6.QtCore import Qt
 from class_db_qsqltablemodel import NirModel
 from settings import DB_URL
+
+
+def connect_db(db_name=None):
+    try:
+        db = QSqlDatabase.addDatabase("QSQLITE")
+        db.setDatabaseName(db_name)
+    except:
+        msgBox = QMessageBox()
+        msgBox.setText("Ошибка подключения к БД")
+        msgBox.exec()
+        sys.exit()
+    return db
 
 
 class App(QWidget):
@@ -19,25 +31,14 @@ class App(QWidget):
         self.w_root = Ui_MainWindow()
         self.w_root.setupUi(self.w)
 
-        self.connect_db(DB_URL)
+        self.db = connect_db(DB_URL)
 
         nirModel = NirModel(self.db)
         self.w_root.tableView.setModel(nirModel)
         self.w_root.tableView.horizontalHeader().moveSection(0, 1)
+        self.w_root.tableView.resizeColumnsToContents()
 
         self.w.show()
-
-    def connect_db(self, db_name=None):
-        if os.path.isfile(DB_URL):
-            self.db = QSqlDatabase.addDatabase("QSQLITE")
-            self.db.setDatabaseName(db_name)
-            if not self.db.open():
-                print('ERROR CONNECTION TO DATABASE')
-                self.w_root.statusbar.showMessage("Ошибка подключения к БД ", 2500)
-            else:
-                self.w_root.statusbar.showMessage("Подключение к базе прошло успешно ", 2500)
-        else:
-            self.w_root.statusbar.showMessage(f"Базы данных {DB_URL} не существует", 2500)
 
 
 if __name__ == "__main__":

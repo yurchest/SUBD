@@ -1,2 +1,2 @@
 
-DB_URL='Databases/my_bd.db'
+DB_URL='Databases/my_db2.db'
