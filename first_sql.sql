@@ -16,3 +16,6 @@ SELECT codvuz, rnw, COUNT(*)
 FROM Tp_nir
 GROUP BY codvuz, rnw
 HAVING COUNT(*) > 1;
+
+UPDATE Tp_nir
+SET f10 = REPLACE(Tp_nir.f10, ',', ';')

@@ -4,9 +4,9 @@ from PyQt6.QtCore import Qt
 
 class NirModel(QSqlTableModel):
     header_data = {'codvuz': "Код вуза",
-                   "rnw": "Регистрационный номер НИР",
+                   "rnw": "Рег. номер НИР",
                    "f1": "Характер  НИР",
-                   "z2": "Сокращенное наименование вуза",
+                   "z2": "Сокр. наим. вуза",
                    "f6": "Руководитель НИР",
                    "f10": "Код темы по ГРНТИ",
                    "f2": "Наименование НИР",
@@ -21,8 +21,8 @@ class NirModel(QSqlTableModel):
             print('Success')
         self.setTable("Tp_nir")
         self.change_column_name()
-
         self.select()
+        # self.setEditStrategy(QSqlTableModel.EditStrategy.OnManualSubmit)
 
     def change_column_name(self):
         for i in range(self.columnCount()):

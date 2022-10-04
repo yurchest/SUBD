@@ -1,15 +1,13 @@
 import sys
 import os
-from database_sqlalchemy import session
+from dotenv import load_dotenv
 
-from PyQt6.QtSql import QSqlTableModel, QSqlDatabase, QSqlRelationalTableModel
-from PyQt6.QtWidgets import QApplication, QWidget, QFileDialog, QTableView, QHeaderView, QMessageBox
-from form import *
-from ListClasses import VuzList
-from database_sqlalchemy import VUZ
-from PyQt6.QtCore import Qt
-from class_db_qsqltablemodel import NirModel
-from settings import DB_URL
+from PyQt6.QtSql import QSqlDatabase
+from PyQt6.QtWidgets import QApplication, QWidget, QMessageBox, QAbstractItemView
+from UI.py_ui.form import *
+from Models.NIR import NirModel
+
+load_dotenv()
 
 
 def connect_db(db_name=None):
@@ -30,15 +28,26 @@ class App(QWidget):
         self.w = QtWidgets.QMainWindow()
         self.w_root = Ui_MainWindow()
         self.w_root.setupUi(self.w)
+        print(os.environ.get('DB_URL'))
+        self.db = connect_db(os.getenv('DB_URL'))
 
-        self.db = connect_db(DB_URL)
-
-        nirModel = NirModel(self.db)
-        self.w_root.tableView.setModel(nirModel)
-        self.w_root.tableView.horizontalHeader().moveSection(0, 1)
-        self.w_root.tableView.resizeColumnsToContents()
+        nir_model = NirModel(self.db)
+        self.w_root.tableView.setModel(nir_model)
+        self.init_tableview_nir()
 
         self.w.show()
+
+    def init_tableview_nir(self):
+        self.w_root.tableView.setSortingEnabled(True)
+        self.w_root.tableView.horizontalHeader().moveSection(0, 1)
+        self.resize_columns_nir()
+        self.w_root.tableView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+
+    def resize_columns_nir(self):
+        ### NIR TABLE
+        for i in [0, 1, 2, 3, 4, 5, 7, 8]:
+            self.w_root.tableView.resizeColumnToContents(i)
+        self.w_root.tableView.setColumnWidth(6, 200)
 
 
 if __name__ == "__main__":
