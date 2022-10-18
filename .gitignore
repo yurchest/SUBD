@@ -1,3 +1,4 @@
 /env/
 /.idea/
 /СУБД лаб FOR STUD/
+__pycache__*

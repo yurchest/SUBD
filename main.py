@@ -2,13 +2,16 @@ import sys
 import os
 from dotenv import load_dotenv
 
+from PyQt6 import QtWidgets
+from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtSql import QSqlDatabase, QSqlQuery
 from PyQt6.QtWidgets import QApplication, QWidget, QMessageBox, QAbstractItemView
-from UI.py_ui.form import *
+from UI import py_ui
 from Models.NIR import NirModel
 from PyQt6.QtCore import Qt
 
-from Widgets.edit_record_nir import EditRecordNir
+# from Widgets.edit_record_nir import EditRecordNir
+import Widgets
 
 load_dotenv()
 
@@ -29,7 +32,7 @@ class App(QWidget):
     def __init__(self):
         QWidget.__init__(self)
         self.w = QtWidgets.QMainWindow()
-        self.w_root = Ui_MainWindow()
+        self.w_root = py_ui.form.Ui_MainWindow()
         self.w_root.setupUi(self.w)
 
         self.db = connect_db(os.getenv('DB_URL'))
@@ -38,6 +41,10 @@ class App(QWidget):
         self.update_nir_view()
 
         self.edit_record_nir_form = None
+
+        self.delete_accept_form = Widgets.DeleteAccept()
+
+
 
         self.w_root.pushButton.clicked.connect(self.open_edit_record_nir)
         self.w_root.pushButton_3.clicked.connect(self.delete_records_nir)
@@ -64,7 +71,7 @@ class App(QWidget):
 
     def open_edit_record_nir(self):
         if self.edit_record_nir_form is None:
-            self.edit_record_nir_form = EditRecordNir()
+            self.edit_record_nir_form = Widgets.EditRecordNir()
             self.edit_record_nir_form.w.exec()
         else:
             self.edit_record_nir_form.close()
@@ -84,6 +91,8 @@ class App(QWidget):
             self.update_nir_view()
             # self.w_root.tableView.setModel(self.nir_model)
 
+            self.delete_accept_form.w.close()
+
         rows_to_delete = []
         for index in self.w_root.tableView.selectionModel().selectedRows():
             rows_to_delete.append(
@@ -91,8 +100,9 @@ class App(QWidget):
                  'rnw': self.nir_model.data(self.nir_model.index(index.row(), 1))
                  })
         if rows_to_delete:
-            # TODO Подтверждение удаления
-            accept_delete(rows_to_delete)
+            self.delete_accept_form.w.show()
+            self.delete_accept_form.w_root.pushButton.clicked.connect(lambda: accept_delete(rows_to_delete))
+            self.delete_accept_form.w_root.pushButton_2.clicked.connect(lambda: self.delete_accept_form.w.close())
 
 
 
