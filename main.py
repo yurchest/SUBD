@@ -150,13 +150,17 @@ class App(QWidget):
             case 'Экспериментальная разработка':
                 char_nir = 'Р'
 
+
+        if not self.edit_record_nir_form.w_root.lineEdit_9.text():
+            print('xxx')
+
         edited_row = \
             {
                 'codvuz': codvuz,
                 'rnw': self.edit_record_nir_form.w_root.lineEdit.text(),
                 'f1': char_nir,
-                'z2': self.nir_model.data(self.nir_model.index(index.row(), 3)),
-                'f6': self.nir_model.data(self.nir_model.index(index.row(), 4)),
+                'z2': self.edit_record_nir_form.w_root.comboBox_2.currentText(),
+                'f6': self.edit_record_nir_form.w_root.lineEdit_7.text(),
                 'f10': self.nir_model.data(self.nir_model.index(index.row(), 5)),
                 'f2': self.nir_model.data(self.nir_model.index(index.row(), 6)),
                 'f7': self.nir_model.data(self.nir_model.index(index.row(), 7)),
