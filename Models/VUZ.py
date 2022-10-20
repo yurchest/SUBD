@@ -46,6 +46,9 @@ class VuzModel(QSqlTableModel):
         return result
 
     def get_distinct_data(self, data_to_filter):
+        for k in data_to_filter.keys():
+            if not data_to_filter[k]:
+                data_to_filter[k] = ''
         data = \
             {
                 'codvuz': [],
@@ -60,23 +63,26 @@ class VuzModel(QSqlTableModel):
                 "gr_ved": [],
                 "prof": [],
             }
-        query = QSqlQuery(f"""SELECT * FROM VUZ 
-                            WHERE region LIKE '%{data_to_filter['region']}%'
-                            AND z2 LIKE '%{data_to_filter['z2']}%'
-                            AND city LIKE '%{data_to_filter['city']}%'
-                            AND oblname LIKE '%{data_to_filter['oblname']}%'
-                            """)
-        while query.next():
-            data[k].append(query.value(0))
+
+        query_in = f"""SELECT * FROM VUZ 
+                        WHERE region LIKE '%{data_to_filter['region']}%'
+                        AND z2 LIKE '%{data_to_filter['z2']}%'
+                        AND city LIKE '%{data_to_filter['city']}%'
+                        AND oblname LIKE '%{data_to_filter['oblname']}%'
+                        """
 
         for i, k in enumerate(data.keys()):
-            query = QSqlQuery(f"SELECT DISTINCT {k} FROM VUZ")
+            query = QSqlQuery(f"""SELECT DISTINCT {k} FROM ({query_in})""")
             while query.next():
                 data[k].append(query.value(0))
         return data
 
     def filter_x(self, data_to_filter: dict):
 
+        for k in data_to_filter.keys():
+            if not data_to_filter[k]:
+                data_to_filter[k] = ''
+        print(data_to_filter)
         query = QSqlQuery(f"""SELECT * FROM VUZ 
                                     WHERE region LIKE '%{data_to_filter['region']}%'
                                     AND z2 LIKE '%{data_to_filter['z2']}%'
@@ -98,5 +104,6 @@ class VuzModel(QSqlTableModel):
                 "gr_ved": query.value(9),
                 "prof": query.value(10),
             })
+        return filtered_data
 
 
