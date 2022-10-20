@@ -53,9 +53,10 @@ class App(QWidget):
         self.w.show()
 
     def add_record_nir_form(self):
-        self.clear_edit_record_form()
+        self.edit_record_nir_form.clear_form()
         self.edit_record_nir_form.w_root.label_2.setText('Добавление записи')
         query = QSqlQuery()
+        # TODO
         query.exec("SELECT * FROM VUZ")
         vuzes = []
         while query.next():
@@ -68,18 +69,6 @@ class App(QWidget):
         self.edit_record_nir_form.w_root.pushButton_2.clicked.connect(lambda: self.change_add_record_button(add=True))
 
         self.edit_record_nir_form.w.show()
-
-
-    def clear_edit_record_form(self):
-        self.edit_record_nir_form.w_root.comboBox_2.setCurrentIndex(0)
-        self.edit_record_nir_form.w_root.lineEdit.setText('')
-        self.edit_record_nir_form.w_root.comboBox.setCurrentIndex(0)
-        self.edit_record_nir_form.w_root.lineEdit_7.setText('')
-        self.edit_record_nir_form.w_root.lineEdit_4.setText('')
-        self.edit_record_nir_form.w_root.lineEdit_9.setText('')
-        self.edit_record_nir_form.w_root.lineEdit_5.setText('')
-        self.edit_record_nir_form.w_root.textEdit_2.setText('')
-        self.edit_record_nir_form.w_root.lineEdit_8.setText('')
 
     def update_nir_view(self):
         self.w_root.tableView.setSortingEnabled(True)
@@ -100,62 +89,32 @@ class App(QWidget):
         self.w_root.tableView.setColumnWidth(6, 200)
 
     def open_edit_record_nir(self):
-        rows_to_edit = []
-        for index in self.w_root.tableView.selectionModel().selectedRows():
-            rows_to_edit.append(
-                {'codvuz': self.nir_model.data(self.nir_model.index(index.row(), 0)),
-                 'rnw': self.nir_model.data(self.nir_model.index(index.row(), 1)),
-                 'f1': self.nir_model.data(self.nir_model.index(index.row(), 2)),
-                 'z2': self.nir_model.data(self.nir_model.index(index.row(), 3)),
-                 'f6': self.nir_model.data(self.nir_model.index(index.row(), 4)),
-                 'f10': self.nir_model.data(self.nir_model.index(index.row(), 5)),
-                 'f2': self.nir_model.data(self.nir_model.index(index.row(), 6)),
-                 'f7': self.nir_model.data(self.nir_model.index(index.row(), 7)),
-                 'f18': self.nir_model.data(self.nir_model.index(index.row(), 8)),
-                 })
-        if len(rows_to_edit) == 1:
-            edit_row = rows_to_edit[0]
+        self.edit_record_nir_form.clear_form()
+
+        selected_rows =  self.w_root.tableView.selectionModel().selectedRows()
+
+        if len(selected_rows) == 1:
+            edit_row = self.nir_model.row_from_index(selected_rows[0])
             query = QSqlQuery()
+            # TODO В VUZ.py
             query.exec("SELECT * FROM VUZ")
             vuzes = []
             while query.next():
                 vuzes.append(query.value(3))
 
-            ## ВУЗ
-            self.edit_record_nir_form.w_root.comboBox_2.addItems(vuzes)
-            self.edit_record_nir_form.w_root.comboBox_2.setCurrentText(edit_row['z2'])
+            values_to_init_in_form = {
+                "vuzes": vuzes,
+                "current_vuz": edit_row['z2'],
+                "reg_nomer": edit_row['rnw'],
+                "type_of_nir": edit_row['f1'],
+                "head_name": edit_row['f6'],
+                "key_grnti": edit_row['f10'],
+                "amount_of_funding": edit_row['f18'],
+                "name_of_nir": edit_row['f2'],
+                "head_position": edit_row['f7'],
+            }
 
-            ## Регисрационный номер
-            self.edit_record_nir_form.w_root.lineEdit.setText(edit_row['rnw'])
-
-            ## Характер НИР
-            match edit_row['f1']:
-                case 'Ф':
-                    char_nir = 'Фундаментальное исследование'
-                case 'П':
-                    char_nir = 'Прикладное исследование'
-                case 'Р':
-                    char_nir = 'Экспериментальная разработка'
-            self.edit_record_nir_form.w_root.comboBox.setCurrentText(char_nir)
-
-
-            ## Руководитель НИР
-            self.edit_record_nir_form.w_root.lineEdit_7.setText(edit_row['f6'])
-
-            ## Код темы по ГРНТИ
-            self.edit_record_nir_form.w_root.lineEdit_4.setText(edit_row['f10'].partition(';')[0])
-            self.edit_record_nir_form.w_root.lineEdit_9.setText(edit_row['f10'].partition(';')[2])
-
-            ## Плановый объем финансирования
-
-            self.edit_record_nir_form.w_root.lineEdit_5.setText(str(edit_row['f18']))
-
-            ## Наименование НИР
-            self.edit_record_nir_form.w_root.textEdit_2.setText(edit_row['f2'])
-
-            ## Должность руководителя
-            self.edit_record_nir_form.w_root.lineEdit_8.setText(edit_row['f7'])
-
+            self.edit_record_nir_form.set_vales(values_to_init_in_form)
             # ----------------------------------------------------------
             try:
                 self.edit_record_nir_form.w_root.pushButton_2.clicked.disconnect()
@@ -163,110 +122,46 @@ class App(QWidget):
                 pass
             self.edit_record_nir_form.w_root.pushButton_2.clicked.connect(
                 lambda: self.change_add_record_button(add=False, changed_codvuz=edit_row['codvuz'],
-                                                      changed_rnw=edit_row['rnw']))
+                                                      changed_rnw=edit_row['rnw'], selected_row=selected_rows[0].row()))
 
             self.edit_record_nir_form.w.show()
 
-    def change_add_record_button(self, add, changed_codvuz=0, changed_rnw='0'):
-        error = False
-        query = QSqlQuery(f"SELECT * FROM VUZ WHERE z2='{self.edit_record_nir_form.w_root.comboBox_2.currentText()}'")
-        while query.next():
-            codvuz = query.value(0)
+    def change_add_record_button(self, add, changed_codvuz=0, changed_rnw='0', selected_row=None):
 
-        match self.edit_record_nir_form.w_root.comboBox.currentText():
-            case 'Фундаментальное исследование':
-                char_nir = 'Ф'
-            case 'Прикладное исследование':
-                char_nir = 'П'
-            case 'Экспериментальная разработка':
-                char_nir = 'Р'
+        edited_row = self.edit_record_nir_form.get_data()
+        if not edited_row['error']:
+            # TODO
+            query = QSqlQuery(f"SELECT * FROM VUZ WHERE z2='{edited_row['z2']}'")
+            while query.next():
+                edited_row['codvuz'] = query.value(0)
 
-        if self.edit_record_nir_form.w_root.lineEdit_9.text() == '..':
-            kod_grnti = self.edit_record_nir_form.w_root.lineEdit_4.text()
-            if len(kod_grnti) != 8:
-                self.edit_record_nir_form.w_root.label_6.setStyleSheet('color: rgb(255, 0, 0);')
-                error = True
-        else:
-            kod_grnti = self.edit_record_nir_form.w_root.lineEdit_4.text() + ';' + self.edit_record_nir_form.w_root.lineEdit_9.text()
-            if len(kod_grnti) != 17:
-                self.edit_record_nir_form.w_root.label_6.setStyleSheet('color: rgb(255, 0, 0);')
-                error = True
-
-
-
-        if not error:
-            edited_row = \
-                {
-                    'codvuz': codvuz,
-                    'rnw': self.edit_record_nir_form.w_root.lineEdit.text(),
-                    'f1': char_nir,
-                    'z2': self.edit_record_nir_form.w_root.comboBox_2.currentText(),
-                    'f6': self.edit_record_nir_form.w_root.lineEdit_7.text(),
-                    'f10': kod_grnti,
-                    'f2': self.edit_record_nir_form.w_root.textEdit_2.toPlainText(),
-                    'f7': self.edit_record_nir_form.w_root.lineEdit_8.text(),
-                    'f18': self.edit_record_nir_form.w_root.lineEdit_5.text(),
-                }
             if not add:
-                query = QSqlQuery(f"""
-                        UPDATE Tp_nir 
-                        SET codvuz={edited_row['codvuz']},
-                            rnw='{edited_row['rnw']}',
-                            f1='{edited_row['f1']}',
-                            z2='{edited_row['z2']}',
-                            f6='{edited_row['f6']}',
-                            f10='{edited_row['f10']}',
-                            f2='{edited_row['f2']}',
-                            f7='{edited_row['f7']}',
-                            f18={edited_row['f18']}
-                        WHERE codvuz={changed_codvuz} AND rnw='{changed_rnw}';
-                """)
-                self.nir_model.setQuery(query)
-                self.nir_model.update()
+                self.nir_model.update_row(edited_row, changed_codvuz, changed_rnw)
                 self.update_nir_view()
+                self.w_root.tableView.selectRow(selected_row)
                 self.edit_record_nir_form.w.close()
-            else:
-                query = QSqlQuery(f"""
-                                        SELECT COUNT(*) FROM Tp_nir WHERE codvuz={codvuz} AND rnw='{self.edit_record_nir_form.w_root.lineEdit.text()}'
-                        """)
-                while query.next():
-                    value = query.value(0)
-                print(type(value))
 
-                if value != 0:
+            else:
+                if not self.nir_model.add_row(edited_row):
                     self.edit_record_nir_form.w_root.label_11.setText('Запись уже существует')
                 else:
-                    print('x')
-                    query = QSqlQuery(f"""
-                            INSERT INTO Tp_nir(codvuz, rnw, f1, z2, f6, f10, f2, f7, f18)
-                            VALUES ({edited_row['codvuz']},'{edited_row['rnw']}', '{edited_row['f1']}','{edited_row['z2']}', '{edited_row['f6']}', '{edited_row['f10']}', '{edited_row['f2']}', '{edited_row['f7']}', {edited_row['f18']})
-                                    """)
-                    self.nir_model.setQuery(query)
-                    self.nir_model.update()
                     self.update_nir_view()
+                    # TODO
+                    #  self.w_root.tableView.selectRow()
                     self.edit_record_nir_form.w.close()
 
     def delete_records_nir(self):
         def accept_delete(rows_to_delete):
-            for row in rows_to_delete:
-                query = QSqlQuery(f"DELETE FROM TP_nir WHERE codvuz={row['codvuz']} AND rnw='{row['rnw']}'")
-                self.nir_model.setQuery(query)
-            self.nir_model.update()
+            self.nir_model.delete_rows(rows_to_delete)
             self.update_nir_view()
-            # self.w_root.tableView.setModel(self.nir_model)
-
             self.delete_accept_form.w.close()
 
         rows_to_delete = []
         for index in self.w_root.tableView.selectionModel().selectedRows():
-            rows_to_delete.append(
-                {'codvuz': self.nir_model.data(self.nir_model.index(index.row(), 0)),
-                 'rnw': self.nir_model.data(self.nir_model.index(index.row(), 1))
-                 })
+            rows_to_delete.append(self.nir_model.row_from_index(index))
         if rows_to_delete:
             self.delete_accept_form.w.show()
             self.delete_accept_form.w_root.pushButton.clicked.connect(lambda: accept_delete(rows_to_delete))
-            self.delete_accept_form.w_root.pushButton_2.clicked.connect(lambda: self.delete_accept_form.w.close())
 
 
 if __name__ == "__main__":
