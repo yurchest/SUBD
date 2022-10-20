@@ -113,6 +113,7 @@ class EditRecordNir(QWidget):
 
         return edited_row
 
+    # def get_codvuz_from_z1
 
 
 

@@ -98,3 +98,4 @@ class NirModel(QSqlTableModel):
             self.setQuery(query)
             self.update()
             return True
+

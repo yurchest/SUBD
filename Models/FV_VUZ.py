@@ -24,3 +24,23 @@ class FinanceVuzModel(QSqlTableModel):
     def update(self):
         query = QSqlQuery("SELECT * FROM Tp_fv")
         self.setQuery(query)
+
+    def recalculate_row(self, edited_row):
+        query = QSqlQuery(f"""
+                SELECT SUM(f18), COUNT(*)
+                FROM Tp_nir 
+                WHERE codvuz = {edited_row['codvuz']}
+        """)
+        while query.next():
+            sum_f18 = query.value(0)
+            count = query.value(1)
+
+        query = QSqlQuery(f"""
+                UPDATE Tp_fv
+                SET z3 = {sum_f18},
+                    numworks = {count}
+                WHERE codvuz={edited_row['codvuz']}
+        """)
+        self.setQuery(query)
+        self.update()
+        pass

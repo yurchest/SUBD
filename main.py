@@ -67,12 +67,8 @@ class App(QWidget):
         self.edit_record_nir_form.clear_form()
         self.edit_record_nir_form.w_root.pushButton_2.setText('Добавить запись')
         self.edit_record_nir_form.w_root.label_2.setText('Добавление записи')
-        query = QSqlQuery()
-        # TODO
-        query.exec("SELECT * FROM VUZ")
-        vuzes = []
-        while query.next():
-            vuzes.append(query.value(3))
+
+        vuzes = self.vuz_model.get_list_vuzes()
 
         ## ВУЗ
         self.edit_record_nir_form.w_root.comboBox_2.addItems(vuzes)
@@ -89,12 +85,7 @@ class App(QWidget):
 
         if len(selected_rows) == 1:
             edit_row = self.nir_model.row_from_index(selected_rows[0])
-            query = QSqlQuery()
-            # TODO В VUZ.py
-            query.exec("SELECT * FROM VUZ")
-            vuzes = []
-            while query.next():
-                vuzes.append(query.value(3))
+            vuzes = self.vuz_model.get_list_vuzes()
 
             values_to_init_in_form = {
                 "vuzes": vuzes,
@@ -124,14 +115,10 @@ class App(QWidget):
 
         edited_row = self.edit_record_nir_form.get_data()
         if not edited_row['error']:
-            # TODO
-            query = QSqlQuery(f"SELECT * FROM VUZ WHERE z2='{edited_row['z2']}'")
-            while query.next():
-                edited_row['codvuz'] = query.value(0)
+            edited_row['codvuz'] = self.vuz_model.get_codvuz_from_z2(edited_row['z2'])
 
             if not add:
                 self.nir_model.update_row(edited_row, changed_codvuz, changed_rnw)
-                update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3)
                 self.w_root.tableView.selectRow(selected_row)
                 self.edit_record_nir_form.w.close()
 
@@ -139,10 +126,11 @@ class App(QWidget):
                 if not self.nir_model.add_row(edited_row):
                     self.edit_record_nir_form.w_root.label_11.setText('Запись уже существует')
                 else:
-                    update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3)
                     # TODO
                     #  self.w_root.tableView.selectRow()
                     self.edit_record_nir_form.w.close()
+            self.fin_vuz_model.recalculate_row(edited_row)
+            update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3)
 
     def delete_records_nir(self):
         def accept_delete(rows_to_delete):

@@ -30,3 +30,17 @@ class VuzModel(QSqlTableModel):
     def update(self):
         query = QSqlQuery("SELECT * FROM VUZ")
         self.setQuery(query)
+
+    def get_list_vuzes(self) -> list:
+        query = QSqlQuery()
+        query.exec("SELECT * FROM VUZ")
+        vuzes = []
+        while query.next():
+            vuzes.append(query.value(3))
+        return vuzes
+
+    def get_codvuz_from_z2(self, z2):
+        query = QSqlQuery(f"SELECT codvuz FROM VUZ WHERE z2='{z2}'")
+        while query.next():
+            result = query.value(0)
+        return result
