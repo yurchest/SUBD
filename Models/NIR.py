@@ -1,7 +1,7 @@
 from typing import Dict
 
 from PyQt6.QtSql import *
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QSortFilterProxyModel
 
 
 class NirModel(QSqlTableModel):
@@ -99,3 +99,14 @@ class NirModel(QSqlTableModel):
             self.update()
             return True
 
+    def get_indexes_of_rows(self, row):
+        while self.canFetchMore():
+            self.fetchMore()
+        selected_rows = []
+        for i in range(self.rowCount()):
+            if row['codvuz'] == self.data(self.index(i, 0)) and row['rnw'] == self.data(self.index(i, 1)):
+                selected_rows.append(i)
+        if len(selected_rows) == 1:
+            return selected_rows[0]
+        else:
+            return 0

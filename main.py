@@ -48,6 +48,11 @@ class App(QWidget):
         self.w_root.tableView_2.setModel(self.fin_vuz_model)
         self.w_root.tableView_3.setModel(self.vuz_model)
 
+
+        self.w_root.tableView.sortByColumn(3, Qt.SortOrder.AscendingOrder)
+        self.w_root.tableView_2.sortByColumn(0, Qt.SortOrder.AscendingOrder)
+        self.w_root.tableView_3.sortByColumn(3, Qt.SortOrder.AscendingOrder)
+
         self.w_root.action_1.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_1))
         self.w_root.action_2.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_2))
         self.w_root.action_3.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_3))
@@ -119,7 +124,6 @@ class App(QWidget):
 
             if not add:
                 self.nir_model.update_row(edited_row, changed_codvuz, changed_rnw)
-                self.w_root.tableView.selectRow(selected_row)
                 self.edit_record_nir_form.w.close()
 
             else:
@@ -129,13 +133,17 @@ class App(QWidget):
                     # TODO
                     #  self.w_root.tableView.selectRow()
                     self.edit_record_nir_form.w.close()
-            self.fin_vuz_model.recalculate_row(edited_row)
+            self.fin_vuz_model.recalculate_row([edited_row])
             update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3)
+            row_to_select = self.nir_model.get_indexes_of_rows(edited_row)
+            self.w_root.tableView.selectRow(row_to_select)
+            self.w_root.tableView.scrollTo(self.nir_model.index(row_to_select, 0))
 
     def delete_records_nir(self):
         def accept_delete(rows_to_delete):
             self.nir_model.delete_rows(rows_to_delete)
             update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3)
+            self.fin_vuz_model.recalculate_row(rows_to_delete)
             self.delete_accept_form.w.close()
 
         rows_to_delete = []
