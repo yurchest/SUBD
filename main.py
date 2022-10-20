@@ -9,6 +9,7 @@ from PyQt6.QtCore import pyqtSignal
 from PyQt6.QtSql import QSqlDatabase, QSqlQuery
 from PyQt6.QtWidgets import QApplication, QWidget, QMessageBox, QAbstractItemView
 from UI import py_ui
+from utils.update_table_views import update_table_views
 import Models
 from PyQt6.QtCore import Qt
 
@@ -38,10 +39,20 @@ class App(QWidget):
         self.w_root.setupUi(self.w)
 
         self.db = connect_db(os.getenv('DB_URL'))
+
         self.nir_model = Models.NirModel(self.db)
         self.vuz_model = Models.VuzModel(self.db)
+        self.fin_vuz_model = Models.FinanceVuzModel(self.db)
+
         self.w_root.tableView.setModel(self.nir_model)
-        self.update_nir_view()
+        self.w_root.tableView_2.setModel(self.fin_vuz_model)
+        self.w_root.tableView_3.setModel(self.vuz_model)
+
+        self.w_root.action_1.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_1))
+        self.w_root.action_2.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_2))
+        self.w_root.action_3.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_3))
+
+        update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3)
 
         self.delete_accept_form = Widgets.DeleteAccept()
         self.edit_record_nir_form = Widgets.EditRecordNir()
@@ -54,6 +65,7 @@ class App(QWidget):
 
     def add_record_nir_form(self):
         self.edit_record_nir_form.clear_form()
+        self.edit_record_nir_form.w_root.pushButton_2.setText('Добавить запись')
         self.edit_record_nir_form.w_root.label_2.setText('Добавление записи')
         query = QSqlQuery()
         # TODO
@@ -66,32 +78,14 @@ class App(QWidget):
         self.edit_record_nir_form.w_root.comboBox_2.addItems(vuzes)
 
         self.edit_record_nir_form.w_root.pushButton_2.disconnect()
-        self.edit_record_nir_form.w_root.pushButton_2.clicked.connect(lambda: self.change_add_record_button(add=True))
+        self.edit_record_nir_form.w_root.pushButton_2.clicked.connect(lambda: self.change_add_record(add=True))
 
         self.edit_record_nir_form.w.show()
-
-    def update_nir_view(self):
-        self.w_root.tableView.setSortingEnabled(True)
-        self.w_root.tableView.horizontalHeader().moveSection(3, 0)
-        self.w_root.tableView.horizontalHeader().moveSection(4, 1)
-        self.w_root.tableView.horizontalHeader().moveSection(8, 2)
-        self.w_root.tableView.horizontalHeader().moveSection(6, 3)
-        self.w_root.tableView.horizontalHeader().moveSection(7, 4)
-        self.w_root.tableView.horizontalHeader().moveSection(8, 5)
-        self.w_root.tableView.horizontalHeader().setFixedHeight(60)
-        self.resize_columns_nir()
-        self.w_root.tableView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-
-    def resize_columns_nir(self):
-        for i in range(9):
-            self.w_root.tableView.resizeColumnToContents(i)
-            self.w_root.tableView.setColumnWidth(i, self.w_root.tableView.columnWidth(i) - 10)
-        self.w_root.tableView.setColumnWidth(6, 200)
 
     def open_edit_record_nir(self):
         self.edit_record_nir_form.clear_form()
 
-        selected_rows =  self.w_root.tableView.selectionModel().selectedRows()
+        selected_rows = self.w_root.tableView.selectionModel().selectedRows()
 
         if len(selected_rows) == 1:
             edit_row = self.nir_model.row_from_index(selected_rows[0])
@@ -121,12 +115,12 @@ class App(QWidget):
             except:
                 pass
             self.edit_record_nir_form.w_root.pushButton_2.clicked.connect(
-                lambda: self.change_add_record_button(add=False, changed_codvuz=edit_row['codvuz'],
-                                                      changed_rnw=edit_row['rnw'], selected_row=selected_rows[0].row()))
+                lambda: self.change_add_record(add=False, changed_codvuz=edit_row['codvuz'],
+                                               changed_rnw=edit_row['rnw'], selected_row=selected_rows[0].row()))
 
             self.edit_record_nir_form.w.show()
 
-    def change_add_record_button(self, add, changed_codvuz=0, changed_rnw='0', selected_row=None):
+    def change_add_record(self, add, changed_codvuz=0, changed_rnw='0', selected_row=None):
 
         edited_row = self.edit_record_nir_form.get_data()
         if not edited_row['error']:
@@ -137,7 +131,7 @@ class App(QWidget):
 
             if not add:
                 self.nir_model.update_row(edited_row, changed_codvuz, changed_rnw)
-                self.update_nir_view()
+                update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3)
                 self.w_root.tableView.selectRow(selected_row)
                 self.edit_record_nir_form.w.close()
 
@@ -145,7 +139,7 @@ class App(QWidget):
                 if not self.nir_model.add_row(edited_row):
                     self.edit_record_nir_form.w_root.label_11.setText('Запись уже существует')
                 else:
-                    self.update_nir_view()
+                    update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3)
                     # TODO
                     #  self.w_root.tableView.selectRow()
                     self.edit_record_nir_form.w.close()
@@ -153,7 +147,7 @@ class App(QWidget):
     def delete_records_nir(self):
         def accept_delete(rows_to_delete):
             self.nir_model.delete_rows(rows_to_delete)
-            self.update_nir_view()
+            update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3)
             self.delete_accept_form.w.close()
 
         rows_to_delete = []
