@@ -48,7 +48,6 @@ class App(QWidget):
         self.w_root.tableView_2.setModel(self.fin_vuz_model)
         self.w_root.tableView_3.setModel(self.vuz_model)
 
-
         self.w_root.tableView.sortByColumn(3, Qt.SortOrder.AscendingOrder)
         self.w_root.tableView_2.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.w_root.tableView_3.sortByColumn(3, Qt.SortOrder.AscendingOrder)
@@ -61,19 +60,26 @@ class App(QWidget):
 
         self.delete_accept_form = Widgets.DeleteAccept()
         self.edit_record_nir_form = Widgets.EditRecordNir()
+        self.filter_nir_form = Widgets.FilterNir(self.vuz_model)
 
         self.w_root.pushButton.clicked.connect(self.open_edit_record_nir)
         self.w_root.pushButton_3.clicked.connect(self.delete_records_nir)
         self.w_root.pushButton_2.clicked.connect(self.add_record_nir_form)
+        self.w_root.pushButton_4.clicked.connect(self.open_filter_form)
 
         self.w.show()
+
+    def open_filter_form(self):
+
+        self.filter_nir_form.reset()
+        self.filter_nir_form.w.show()
 
     def add_record_nir_form(self):
         self.edit_record_nir_form.clear_form()
         self.edit_record_nir_form.w_root.pushButton_2.setText('Добавить запись')
         self.edit_record_nir_form.w_root.label_2.setText('Добавление записи')
 
-        vuzes = self.vuz_model.get_list_vuzes()
+        vuzes = self.vuz_model.get_list_vuzes_z2()
 
         ## ВУЗ
         self.edit_record_nir_form.w_root.comboBox_2.addItems(vuzes)
@@ -84,13 +90,15 @@ class App(QWidget):
         self.edit_record_nir_form.w.show()
 
     def open_edit_record_nir(self):
+        self.edit_record_nir_form.w_root.pushButton_2.setText('Принять')
+        self.edit_record_nir_form.w_root.label_2.setText('Редактирование записи')
         self.edit_record_nir_form.clear_form()
 
         selected_rows = self.w_root.tableView.selectionModel().selectedRows()
 
         if len(selected_rows) == 1:
             edit_row = self.nir_model.row_from_index(selected_rows[0])
-            vuzes = self.vuz_model.get_list_vuzes()
+            vuzes = self.vuz_model.get_list_vuzes_z2()
 
             values_to_init_in_form = {
                 "vuzes": vuzes,
@@ -130,9 +138,8 @@ class App(QWidget):
                 if not self.nir_model.add_row(edited_row):
                     self.edit_record_nir_form.w_root.label_11.setText('Запись уже существует')
                 else:
-                    # TODO
-                    #  self.w_root.tableView.selectRow()
                     self.edit_record_nir_form.w.close()
+
             self.fin_vuz_model.recalculate_row([edited_row])
             update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3)
             row_to_select = self.nir_model.get_indexes_of_rows(edited_row)

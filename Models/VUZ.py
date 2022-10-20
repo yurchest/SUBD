@@ -31,12 +31,12 @@ class VuzModel(QSqlTableModel):
         query = QSqlQuery("SELECT * FROM VUZ")
         self.setQuery(query)
 
-    def get_list_vuzes(self) -> list:
+    def get_list_vuzes_z2(self) -> dict:
         query = QSqlQuery()
-        query.exec("SELECT * FROM VUZ")
+        query.exec("SELECT z2 FROM VUZ")
         vuzes = []
         while query.next():
-            vuzes.append(query.value(3))
+            vuzes.append(query.value(0))
         return vuzes
 
     def get_codvuz_from_z2(self, z2):
@@ -44,3 +44,59 @@ class VuzModel(QSqlTableModel):
         while query.next():
             result = query.value(0)
         return result
+
+    def get_distinct_data(self, data_to_filter):
+        data = \
+            {
+                'codvuz': [],
+                "z1": [],
+                "z1full": [],
+                "z2": [],
+                "region": [],
+                "city": [],
+                "status": [],
+                "obl": [],
+                "oblname": [],
+                "gr_ved": [],
+                "prof": [],
+            }
+        query = QSqlQuery(f"""SELECT * FROM VUZ 
+                            WHERE region LIKE '%{data_to_filter['region']}%'
+                            AND z2 LIKE '%{data_to_filter['z2']}%'
+                            AND city LIKE '%{data_to_filter['city']}%'
+                            AND oblname LIKE '%{data_to_filter['oblname']}%'
+                            """)
+        while query.next():
+            data[k].append(query.value(0))
+
+        for i, k in enumerate(data.keys()):
+            query = QSqlQuery(f"SELECT DISTINCT {k} FROM VUZ")
+            while query.next():
+                data[k].append(query.value(0))
+        return data
+
+    def filter_x(self, data_to_filter: dict):
+
+        query = QSqlQuery(f"""SELECT * FROM VUZ 
+                                    WHERE region LIKE '%{data_to_filter['region']}%'
+                                    AND z2 LIKE '%{data_to_filter['z2']}%'
+                                    AND city LIKE '%{data_to_filter['city']}%'
+                                    AND oblname LIKE '%{data_to_filter['oblname']}%'
+                                    """)
+        filtered_data = []
+        while query.next():
+            filtered_data.append({
+                'codvuz': query.value(0),
+                "z1": query.value(1),
+                "z1full": query.value(2),
+                "z2": query.value(3),
+                "region": query.value(4),
+                "city": query.value(5),
+                "status": query.value(6),
+                "obl": query.value(7),
+                "oblname": query.value(8),
+                "gr_ved": query.value(9),
+                "prof": query.value(10),
+            })
+
+
