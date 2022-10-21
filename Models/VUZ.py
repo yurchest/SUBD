@@ -77,33 +77,9 @@ class VuzModel(QSqlTableModel):
                 data[k].append(query.value(0))
         return data
 
-    def filter_x(self, data_to_filter: dict):
 
-        for k in data_to_filter.keys():
-            if not data_to_filter[k]:
-                data_to_filter[k] = ''
-        print(data_to_filter)
-        query = QSqlQuery(f"""SELECT * FROM VUZ 
-                                    WHERE region LIKE '%{data_to_filter['region']}%'
-                                    AND z2 LIKE '%{data_to_filter['z2']}%'
-                                    AND city LIKE '%{data_to_filter['city']}%'
-                                    AND oblname LIKE '%{data_to_filter['oblname']}%'
-                                    """)
-        filtered_data = []
-        while query.next():
-            filtered_data.append({
-                'codvuz': query.value(0),
-                "z1": query.value(1),
-                "z1full": query.value(2),
-                "z2": query.value(3),
-                "region": query.value(4),
-                "city": query.value(5),
-                "status": query.value(6),
-                "obl": query.value(7),
-                "oblname": query.value(8),
-                "gr_ved": query.value(9),
-                "prof": query.value(10),
-            })
-        return filtered_data
+
+
+
 
 

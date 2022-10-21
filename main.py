@@ -60,7 +60,7 @@ class App(QWidget):
 
         self.delete_accept_form = Widgets.DeleteAccept()
         self.edit_record_nir_form = Widgets.EditRecordNir()
-        self.filter_nir_form = Widgets.FilterNir(self.vuz_model)
+        self.filter_nir_form = Widgets.FilterNir(self.vuz_model, self.nir_model)
 
         self.w_root.pushButton.clicked.connect(self.open_edit_record_nir)
         self.w_root.pushButton_3.clicked.connect(self.delete_records_nir)
@@ -70,7 +70,6 @@ class App(QWidget):
         self.w.show()
 
     def open_filter_form(self):
-
         self.filter_nir_form.reset()
         self.filter_nir_form.w.show()
 

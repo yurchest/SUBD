@@ -1,9 +1,10 @@
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIntValidator, QColor, QBrush
+from PyQt6.QtSql import QSqlQuery
 from PyQt6.QtWidgets import QWidget, QComboBox
 
-from Models import VuzModel
+from Models import VuzModel, NirModel
 from UI import py_ui
 
 
@@ -16,17 +17,20 @@ class FilterNir(QWidget):
             "oblname": None,
         }
 
-    def __init__(self, vuz_model: VuzModel):
+    def __init__(self, vuz_model: VuzModel, nir_model: NirModel):
         QWidget.__init__(self)
         self.w = QtWidgets.QDialog()
         self.w_root = py_ui.filter_nir.Ui_Form()
         self.w_root.setupUi(self.w)
+
         self.vuz_model = vuz_model
+        self.nir_model = nir_model
 
         self.vuz_data = self.vuz_model.get_distinct_data(self.data_to_filter)
         self.set_values(self.vuz_data)
 
-        self.w_root.lineEdit.setInputMask("00.00.00")
+        self.w_root.lineEdit.setMaxLength(2)
+        self.w_root.lineEdit.setValidator(QIntValidator())
 
         self.w_root.comboBox_2.currentTextChanged.connect(self.region_changed)
         self.w_root.comboBox_3.currentTextChanged.connect(self.oblname_changed)
@@ -34,7 +38,9 @@ class FilterNir(QWidget):
         self.w_root.comboBox_5.currentTextChanged.connect(self.vuz_changed)
 
         self.w_root.pushButton_4.clicked.connect(self.reset)
+        self.w_root.pushButton_2.clicked.connect(self.filter_update_nir_table)
         self.w_root.pushButton_3.clicked.connect(lambda: self.w.close())
+
 
     def reset(self):
         self.data_to_filter = \
@@ -76,10 +82,12 @@ class FilterNir(QWidget):
         self.w_root.comboBox_5.addItems(values['z2'])
 
         for combobox in self.w.findChildren(QComboBox):
-            if combobox == key_of_none_combobox:
-                combobox.setCurrentText(combobox.itemText(''))
             if combobox.count() == 2:
                 combobox.setCurrentText(combobox.itemText(1))
+            # TODO
+            # if combobox == key_of_none_combobox:
+            #     combobox.setCurrentText(combobox.itemText(''))
+
 
 
         self.w_root.lineEdit.setText('')
@@ -115,8 +123,31 @@ class FilterNir(QWidget):
                     values_to_distinct.update({priority: None})
             self.set_values(self.vuz_model.get_distinct_data(values_to_distinct), key_of_none_combobox=key_of_combobox)
 
+    def filter_update_nir_table(self):
 
-
+        query = QSqlQuery(f"""SELECT * FROM Tp_nir 
+                                WHERE codvuz IN (
+                                SELECT codvuz 
+                                FROM VUZ
+                                WHERE region LIKE '%{self.w_root.comboBox_2.currentText()}%'
+                                AND z2 LIKE '%{self.w_root.comboBox_5.currentText()}%'
+                                AND city LIKE '%{self.w_root.comboBox_4.currentText()}%'
+                                AND oblname LIKE '%{self.w_root.comboBox_3.currentText()}%'
+                                ) 
+                                AND (SUBSTR(f10, 1, 2)  LIKE '%{self.w_root.lineEdit.text()}%'
+                                OR SUBSTR(f10, 10, 11) LIKE '%{self.w_root.lineEdit.text()}%')
+                                """)
+        data = []
+        while query.next():
+            print(query.value(3))
+            data.append(query.value(0))
+        if not data:
+            self.w_root.label_8.setText("Записей с такими параметрами не найдено")
+        else:
+            self.w_root.label_8.setText("")
+            self.nir_model.setQuery(query)
+            self.nir_model.selectStatement()
+            self.w.close()
 
 
     def region_changed(self, value):
