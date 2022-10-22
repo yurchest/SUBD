@@ -329,8 +329,8 @@
     <rect>
      <x>90</x>
      <y>550</y>
-     <width>381</width>
-     <height>21</height>
+     <width>651</width>
+     <height>31</height>
     </rect>
    </property>
    <property name="font">
@@ -339,7 +339,8 @@
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">color: rgb(255, 0, 0);</string>
+    <string notr="true">color: rgba(255, 0, 0, 180)
+</string>
    </property>
    <property name="text">
     <string/>

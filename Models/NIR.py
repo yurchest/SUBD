@@ -1,7 +1,7 @@
 from typing import Dict
 
 from PyQt6.QtSql import *
-from PyQt6.QtCore import Qt, QSortFilterProxyModel
+from PyQt6.QtCore import Qt
 
 
 class NirModel(QSqlTableModel):
@@ -20,6 +20,7 @@ class NirModel(QSqlTableModel):
         super().__init__()
         self.db = db
         self.setTable("Tp_nir")
+        # self.setEditStrategy(QSqlTableModel.EditStrategy.OnFieldChange)
         self.change_column_name()
         self.select()
 
@@ -27,9 +28,6 @@ class NirModel(QSqlTableModel):
         for i in range(self.columnCount()):
             self.setHeaderData(i, Qt.Orientation.Horizontal, self.header_data[self.record().fieldName(i)])
 
-    def update(self):
-        query = QSqlQuery("SELECT * FROM Tp_nir")
-        self.setQuery(query)
 
     def row_from_index(self, index) -> Dict:
         return {'codvuz': self.data(self.index(index.row(), 0)),
@@ -43,18 +41,13 @@ class NirModel(QSqlTableModel):
                 'f18': self.data(self.index(index.row(), 8)),
                 }
 
-    def get_all(self):
-        query = QSqlQuery("SELECT * FROM Tp_nir")
-        self.setQuery(query)
-
     def delete_rows(self, rows_to_delete):
         for row in rows_to_delete:
-            query = QSqlQuery(f"""DELETE FROM TP_nir WHERE codvuz={row['codvuz']} AND rnw='{row['rnw']}'""")
-            self.setQuery(query)
-            self.update()
+            QSqlQuery(f"""DELETE FROM TP_nir WHERE codvuz={row['codvuz']} AND rnw='{row['rnw']}'""")
+            self.select()
 
     def update_row(self, edited_row, changed_codvuz, changed_rnw):
-        query = QSqlQuery(f"""
+        QSqlQuery(f"""
                                 UPDATE Tp_nir 
                                 SET codvuz={edited_row['codvuz']},
                                     rnw='{edited_row['rnw']}',
@@ -67,8 +60,7 @@ class NirModel(QSqlTableModel):
                                     f18={edited_row['f18']}
                                 WHERE codvuz={changed_codvuz} AND rnw='{changed_rnw}';
                         """)
-        self.setQuery(query)
-        self.update()
+        self.select()
 
     def add_row(self, edited_row) -> bool:
         query = QSqlQuery(f"""
@@ -95,8 +87,7 @@ class NirModel(QSqlTableModel):
                     query.addBindValue(edited_row[k])
             query.exec()
 
-            self.setQuery(query)
-            self.update()
+            self.select()
             return True
 
     def get_indexes_of_rows(self, row):
@@ -110,3 +101,13 @@ class NirModel(QSqlTableModel):
             return selected_rows[0]
         else:
             return 0
+
+    def sort_by_codvuz_rnw(self):
+        # print(self.filter())
+        if self.filter():
+            query = QSqlQuery(f"""SELECT * FROM Tp_nir WHERE {self.filter()} ORDER BY codvuz, rnw""")
+        else:
+            query = QSqlQuery(f"""SELECT * FROM Tp_nir ORDER BY codvuz, rnw""")
+        self.setQuery(query)
+
+

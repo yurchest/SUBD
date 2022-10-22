@@ -41,7 +41,6 @@ class FilterNir(QWidget):
         self.w_root.pushButton_2.clicked.connect(self.filter_update_nir_table)
         self.w_root.pushButton_3.clicked.connect(lambda: self.w.close())
 
-
     def reset(self):
         self.data_to_filter = \
             {
@@ -64,6 +63,14 @@ class FilterNir(QWidget):
         self.w_root.lineEdit.setText('')
 
     def set_values(self, values, key_of_none_combobox=None):
+
+        comboboxes = {
+            'region': 'comboBox_2',
+            'oblname': 'comboBox_3',
+            'city': 'comboBox_4',
+            'z2': 'comboBox_5',
+        }
+
         self.w_root.comboBox_2.blockSignals(True)
         self.w_root.comboBox_3.blockSignals(True)
         self.w_root.comboBox_4.blockSignals(True)
@@ -84,11 +91,9 @@ class FilterNir(QWidget):
         for combobox in self.w.findChildren(QComboBox):
             if combobox.count() == 2:
                 combobox.setCurrentText(combobox.itemText(1))
-            # TODO
-            # if combobox == key_of_none_combobox:
-            #     combobox.setCurrentText(combobox.itemText(''))
-
-
+            if key_of_none_combobox:
+                if comboboxes[key_of_none_combobox] == combobox.objectName():
+                    combobox.setCurrentText('')
 
         self.w_root.lineEdit.setText('')
 
@@ -107,7 +112,7 @@ class FilterNir(QWidget):
         }
         if value:
             values_to_distinct.update({key_of_combobox: value})
-            self.set_values(self.vuz_model.get_distinct_data(values_to_distinct), value)
+            self.set_values(self.vuz_model.get_distinct_data(values_to_distinct))
         else:
             values_to_distinct = {
                 "region": self.w_root.comboBox_2.currentText(),
@@ -124,31 +129,31 @@ class FilterNir(QWidget):
             self.set_values(self.vuz_model.get_distinct_data(values_to_distinct), key_of_none_combobox=key_of_combobox)
 
     def filter_update_nir_table(self):
-
-        query = QSqlQuery(f"""SELECT * FROM Tp_nir 
-                                WHERE codvuz IN (
+        where_filter = (f""" codvuz IN (
                                 SELECT codvuz 
                                 FROM VUZ
-                                WHERE region LIKE '%{self.w_root.comboBox_2.currentText()}%'
-                                AND z2 LIKE '%{self.w_root.comboBox_5.currentText()}%'
-                                AND city LIKE '%{self.w_root.comboBox_4.currentText()}%'
-                                AND oblname LIKE '%{self.w_root.comboBox_3.currentText()}%'
+                                WHERE region LIKE '{self.w_root.comboBox_2.currentText()}%'
+                                AND z2 LIKE '{self.w_root.comboBox_5.currentText()}%'
+                                AND city LIKE '{self.w_root.comboBox_4.currentText()}%'
+                                AND oblname LIKE '{self.w_root.comboBox_3.currentText()}%'
                                 ) 
                                 AND (SUBSTR(f10, 1, 2)  LIKE '%{self.w_root.lineEdit.text()}%'
                                 OR SUBSTR(f10, 10, 11) LIKE '%{self.w_root.lineEdit.text()}%')
                                 """)
+
+        query = QSqlQuery(f"""SELECT * FROM Tp_nir 
+                                WHERE {where_filter}
+                                """)
         data = []
         while query.next():
-            print(query.value(3))
             data.append(query.value(0))
         if not data:
             self.w_root.label_8.setText("Записей с такими параметрами не найдено")
+            self.w_root.label_8.setText("Записей с такими параметрами не найдено")
         else:
             self.w_root.label_8.setText("")
-            self.nir_model.setQuery(query)
-            self.nir_model.selectStatement()
+            self.nir_model.setFilter(where_filter)
             self.w.close()
-
 
     def region_changed(self, value):
         self.vuz_combobox_changed(value, 'region')

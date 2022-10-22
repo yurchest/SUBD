@@ -27,10 +27,6 @@ class VuzModel(QSqlTableModel):
         for i in range(self.columnCount()):
             self.setHeaderData(i, Qt.Orientation.Horizontal, self.header_data[self.record().fieldName(i)])
 
-    def update(self):
-        query = QSqlQuery("SELECT * FROM VUZ")
-        self.setQuery(query)
-
     def get_list_vuzes_z2(self) -> dict:
         query = QSqlQuery()
         query.exec("SELECT z2 FROM VUZ")
@@ -65,10 +61,10 @@ class VuzModel(QSqlTableModel):
             }
 
         query_in = f"""SELECT * FROM VUZ 
-                        WHERE region LIKE '%{data_to_filter['region']}%'
-                        AND z2 LIKE '%{data_to_filter['z2']}%'
-                        AND city LIKE '%{data_to_filter['city']}%'
-                        AND oblname LIKE '%{data_to_filter['oblname']}%'
+                        WHERE region LIKE '{data_to_filter['region']}%'
+                        AND z2 LIKE '{data_to_filter['z2']}%'
+                        AND city LIKE '{data_to_filter['city']}%'
+                        AND oblname LIKE '{data_to_filter['oblname']}%'
                         """
 
         for i, k in enumerate(data.keys()):
@@ -76,10 +72,3 @@ class VuzModel(QSqlTableModel):
             while query.next():
                 data[k].append(query.value(0))
         return data
-
-
-
-
-
-
-

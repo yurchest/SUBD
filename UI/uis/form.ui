@@ -40,10 +40,10 @@
      <widget class="QWidget" name="horizontalLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>660</y>
-        <width>644</width>
-        <height>80</height>
+        <x>10</x>
+        <y>680</y>
+        <width>641</width>
+        <height>41</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout">
@@ -100,6 +100,19 @@
       </property>
       <property name="text">
        <string>Данные по НИР</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_6">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>720</y>
+        <width>121</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Сбросить фильтры</string>
       </property>
      </widget>
     </widget>
@@ -187,26 +200,8 @@
      <string>Анализ</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menu_3">
-    <property name="title">
-     <string>Фильтрация</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menu_4">
-    <property name="title">
-     <string>Параметры</string>
-    </property>
-   </widget>
-   <widget class="QMenu" name="menu_5">
-    <property name="title">
-     <string>Выход</string>
-    </property>
-   </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
-   <addaction name="menu_3"/>
-   <addaction name="menu_4"/>
-   <addaction name="menu_5"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_1">

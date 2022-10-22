@@ -5,7 +5,7 @@ from PyQt6.QtGui import QIntValidator
 from dotenv import load_dotenv
 
 from PyQt6 import QtWidgets
-from PyQt6.QtCore import pyqtSignal
+from PyQt6.QtCore import pyqtSignal, QSortFilterProxyModel
 from PyQt6.QtSql import QSqlDatabase, QSqlQuery
 from PyQt6.QtWidgets import QApplication, QWidget, QMessageBox, QAbstractItemView
 from UI import py_ui
@@ -51,6 +51,7 @@ class App(QWidget):
         self.w_root.tableView.sortByColumn(3, Qt.SortOrder.AscendingOrder)
         self.w_root.tableView_2.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.w_root.tableView_3.sortByColumn(3, Qt.SortOrder.AscendingOrder)
+        self.w_root.tableView.horizontalHeader().sectionClicked.connect(self.onNirHeaderClicked)
 
         self.w_root.action_1.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_1))
         self.w_root.action_2.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_2))
@@ -66,11 +67,13 @@ class App(QWidget):
         self.w_root.pushButton_3.clicked.connect(self.delete_records_nir)
         self.w_root.pushButton_2.clicked.connect(self.add_record_nir_form)
         self.w_root.pushButton_4.clicked.connect(self.open_filter_form)
+        self.w_root.pushButton_5.clicked.connect(self.sort_by_codvuz_rnw)
+        self.w_root.pushButton_6.clicked.connect(lambda: self.nir_model.setFilter(''))
 
         self.w.show()
 
     def open_filter_form(self):
-        self.filter_nir_form.reset()
+        # self.filter_nir_form.reset()
         self.filter_nir_form.w.show()
 
     def add_record_nir_form(self):
@@ -135,12 +138,15 @@ class App(QWidget):
 
             else:
                 if not self.nir_model.add_row(edited_row):
-                    self.edit_record_nir_form.w_root.label_11.setText('Запись уже существует')
+                    self.edit_record_nir_form.w_root.label_11.setText(
+                        'НИР с таким номером в данном вузе уже существует')
                 else:
+                    self.nir_model.setFilter('')
+                    self.sort_by_codvuz_rnw()
                     self.edit_record_nir_form.w.close()
 
+
             self.fin_vuz_model.recalculate_row([edited_row])
-            update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3)
             row_to_select = self.nir_model.get_indexes_of_rows(edited_row)
             self.w_root.tableView.selectRow(row_to_select)
             self.w_root.tableView.scrollTo(self.nir_model.index(row_to_select, 0))
@@ -148,9 +154,9 @@ class App(QWidget):
     def delete_records_nir(self):
         def accept_delete(rows_to_delete):
             self.nir_model.delete_rows(rows_to_delete)
-            update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3)
             self.fin_vuz_model.recalculate_row(rows_to_delete)
             self.delete_accept_form.w.close()
+
 
         rows_to_delete = []
         for index in self.w_root.tableView.selectionModel().selectedRows():
@@ -158,6 +164,16 @@ class App(QWidget):
         if rows_to_delete:
             self.delete_accept_form.w.show()
             self.delete_accept_form.w_root.pushButton.clicked.connect(lambda: accept_delete(rows_to_delete))
+
+    def onNirHeaderClicked(self, index):
+
+        pass
+
+    def sort_by_codvuz_rnw(self):
+        self.nir_model.sort_by_codvuz_rnw()
+
+
+
 
 
 if __name__ == "__main__":

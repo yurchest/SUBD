@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import QAbstractItemView, QTableView
 import Models
 
 
-def update_table_views(nir_table: QTableView, fin_vuz_table: QTableView, vuz_table: QTableView, ):
+def update_table_views(nir_table: QTableView, fin_vuz_table: QTableView, vuz_table: QTableView ):
     # nir_table
     nir_table.setSortingEnabled(True)
     change_columns_nir(nir_table)

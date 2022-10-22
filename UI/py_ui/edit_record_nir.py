@@ -20,7 +20,7 @@ class Ui_Form(object):
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.verticalLayoutWidget = QtWidgets.QWidget(Form)
-        self.verticalLayoutWidget.setGeometry(QtCore.QRect(60, 70, 801, 451))
+        self.verticalLayoutWidget.setGeometry(QtCore.QRect(60, 70, 741, 421))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.verticalLayoutWidget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -162,11 +162,12 @@ class Ui_Form(object):
         self.pushButton_2.setObjectName("pushButton_2")
         self.horizontalLayout_10.addWidget(self.pushButton_2)
         self.label_11 = QtWidgets.QLabel(Form)
-        self.label_11.setGeometry(QtCore.QRect(90, 550, 381, 21))
+        self.label_11.setGeometry(QtCore.QRect(90, 550, 651, 31))
         font = QtGui.QFont()
         font.setPointSize(16)
         self.label_11.setFont(font)
-        self.label_11.setStyleSheet("color: rgb(255, 0, 0);")
+        self.label_11.setStyleSheet("color: rgba(255, 0, 0, 180)\n"
+"")
         self.label_11.setText("")
         self.label_11.setObjectName("label_11")
 
