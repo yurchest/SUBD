@@ -149,10 +149,10 @@ class FilterNir(QWidget):
             data.append(query.value(0))
         if not data:
             self.w_root.label_8.setText("Записей с такими параметрами не найдено")
-            self.w_root.label_8.setText("Записей с такими параметрами не найдено")
         else:
             self.w_root.label_8.setText("")
-            self.nir_model.setFilter(where_filter)
+            self.nir_model.whereQuery = "WHERE " + where_filter
+            self.nir_model.update_model()
             self.w.close()
 
     def region_changed(self, value):

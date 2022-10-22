@@ -48,7 +48,7 @@ class App(QWidget):
         self.w_root.tableView_2.setModel(self.fin_vuz_model)
         self.w_root.tableView_3.setModel(self.vuz_model)
 
-        self.w_root.tableView.sortByColumn(3, Qt.SortOrder.AscendingOrder)
+        # self.w_root.tableView.sortByColumn(3, Qt.SortOrder.AscendingOrder)
         self.w_root.tableView_2.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.w_root.tableView_3.sortByColumn(3, Qt.SortOrder.AscendingOrder)
         self.w_root.tableView.horizontalHeader().sectionClicked.connect(self.onNirHeaderClicked)
@@ -68,7 +68,7 @@ class App(QWidget):
         self.w_root.pushButton_2.clicked.connect(self.add_record_nir_form)
         self.w_root.pushButton_4.clicked.connect(self.open_filter_form)
         self.w_root.pushButton_5.clicked.connect(self.sort_by_codvuz_rnw)
-        self.w_root.pushButton_6.clicked.connect(lambda: self.nir_model.setFilter(''))
+        self.w_root.pushButton_6.clicked.connect(self.nir_model.reset_filters)
 
         self.w.show()
 
@@ -144,8 +144,7 @@ class App(QWidget):
                     self.edit_record_nir_form.w_root.label_11.setText(
                         'НИР с таким номером в данном вузе уже существует')
                 else:
-                    self.nir_model.setFilter('')
-                    self.sort_by_codvuz_rnw()
+                    self.nir_model.reset_filters()
                     self.edit_record_nir_form.w.close()
 
             self.fin_vuz_model.recalculate_row([edited_row])
@@ -168,15 +167,28 @@ class App(QWidget):
             self.delete_accept_form.w_root.pushButton.clicked.connect(lambda: accept_delete(rows_to_delete))
 
     def onNirHeaderClicked(self, index):
-        self.nir_model.setFilter('')
-        self.nir_model.select()
+        self.w_root.tableView.scrollTo(self.nir_model.index(0, 0))
+        if self.nir_model.sortOrder[index] == 'ASC':
+            self.nir_model.sortOrder[index] = 'DESC'
+            self.w_root.tableView.horizontalHeader().setSortIndicator(index, Qt.SortOrder.AscendingOrder)
+        else:
+            self.nir_model.sortOrder[index] = 'ASC'
+            self.w_root.tableView.horizontalHeader().setSortIndicator(index, Qt.SortOrder.DescendingOrder)
+
+        if index != 0:
+            self.w_root.tableView.horizontalHeader().setSortIndicatorShown(True)
+            self.nir_model.orderByQuery = f""" ORDER BY {self.nir_model.record().fieldName(index) + ' ' + self.nir_model.sortOrder[index]} """
+        else:
+            self.nir_model.orderByQuery = f""" ORDER BY codvuz {self.nir_model.sortOrder[index]}, LENGTH(rnw), rnw """
+
+        self.nir_model.update_model()
 
 
     def sort_by_codvuz_rnw(self):
-        self.nir_model.sort_by_codvuz_rnw()
-
-
-
+        self.w_root.tableView.scrollTo(self.nir_model.index(0, 0))
+        self.w_root.tableView.horizontalHeader().setSortIndicator(0, Qt.SortOrder.AscendingOrder)
+        self.nir_model.orderByQuery = f""" ORDER BY codvuz, LENGTH(rnw), rnw """
+        self.nir_model.update_model()
 
 
 if __name__ == "__main__":

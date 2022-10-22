@@ -105,11 +105,17 @@
      <widget class="QPushButton" name="pushButton_6">
       <property name="geometry">
        <rect>
-        <x>400</x>
+        <x>410</x>
         <y>720</y>
         <width>121</width>
         <height>21</height>
        </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>DejaVu Sans</family>
+        <pointsize>9</pointsize>
+       </font>
       </property>
       <property name="text">
        <string>Сбросить фильтры</string>
@@ -132,7 +138,7 @@
        <rect>
         <x>20</x>
         <y>40</y>
-        <width>461</width>
+        <width>771</width>
         <height>41</height>
        </rect>
       </property>
@@ -184,7 +190,7 @@
      <x>0</x>
      <y>0</y>
      <width>1608</width>
-     <height>21</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">

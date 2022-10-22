@@ -16,6 +16,8 @@ class NirModel(QSqlTableModel):
                    "f18": "Плановый объем \nфинансирования",
                    }
 
+    sortOrder = ['ASC'] * 9
+
     def __init__(self, db):
         super().__init__()
         self.db = db
@@ -23,6 +25,9 @@ class NirModel(QSqlTableModel):
         # self.setEditStrategy(QSqlTableModel.EditStrategy.OnFieldChange)
         self.change_column_name()
         self.select()
+        self.whereQuery = ''
+        self.orderByQuery = ''
+
 
     def change_column_name(self):
         for i in range(self.columnCount()):
@@ -44,7 +49,7 @@ class NirModel(QSqlTableModel):
     def delete_rows(self, rows_to_delete):
         for row in rows_to_delete:
             self.removeRow(row.row())
-        self.select()
+        self.update_model()
         # for row in rows_to_delete:
         #     QSqlQuery(f"""DELETE FROM TP_nir WHERE codvuz={row['codvuz']} AND rnw='{row['rnw']}'""")
         #     print(self.query().lastQuery())
@@ -64,8 +69,7 @@ class NirModel(QSqlTableModel):
                                     f18={edited_row['f18']}
                                 WHERE codvuz={changed_codvuz} AND rnw='{changed_rnw}';
                         """)
-        print(self.query().lastQuery())
-        self.select()
+        self.update_model()
 
     def add_row(self, edited_row) -> bool:
         query = QSqlQuery(f"""
@@ -91,7 +95,7 @@ class NirModel(QSqlTableModel):
                     query.addBindValue(edited_row[k])
             query.exec()
 
-            self.select()
+            self.update_model()
             return True
 
     def get_indexes_of_rows(self, row):
@@ -107,17 +111,16 @@ class NirModel(QSqlTableModel):
             return 0
 
     def sort_by_codvuz_rnw(self):
-        self.setSort(-1, Qt.SortOrder.AscendingOrder)
-        print(self.selectStatement())
-        self.setFilter(f"""1=1 ORDER BY codvuz, rnw""")
+        self.orderByQuery = f""" ORDER BY codvuz, rnw"""
+        self.update_model()
+
+    def update_model(self):
         self.select()
+        print(self.selectStatement() + self.whereQuery + self.orderByQuery)
+        self.setQuery(QSqlQuery(self.selectStatement() + self.whereQuery + self.orderByQuery))
 
-        # print(self.filter())
-        # if self.filter():
-        #     query = QSqlQuery(f"""SELECT * FROM Tp_nir WHERE {self.filter()} ORDER BY codvuz, rnw""")
-        # else:
-        #     query = QSqlQuery(f"""SELECT * FROM Tp_nir ORDER BY codvuz, rnw""")
-        # self.setQuery(query)
-
+    def reset_filters(self):
+        self.whereQuery = ''
+        self.update_model()
 
 
