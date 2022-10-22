@@ -36,12 +36,11 @@ class FinanceVuzModel(QSqlTableModel):
                 sum_f18 = query.value(0)
                 count = query.value(1)
 
-            query = QSqlQuery(f"""
+            QSqlQuery(f"""
                     UPDATE Tp_fv
                     SET z3 = {sum_f18},
                         numworks = {count}
                     WHERE codvuz={row['codvuz']}
             """)
-            self.setQuery(query)
         self.update()
 

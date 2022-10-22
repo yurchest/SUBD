@@ -131,8 +131,11 @@ class App(QWidget):
         edited_row = self.edit_record_nir_form.get_data()
         if not edited_row['error']:
             edited_row['codvuz'] = self.vuz_model.get_codvuz_from_z2(edited_row['z2'])
+            if not edited_row['f18']:
+                edited_row['f18'] = 0
 
             if not add:
+                print(edited_row)
                 self.nir_model.update_row(edited_row, changed_codvuz, changed_rnw)
                 self.edit_record_nir_form.w.close()
 
@@ -145,7 +148,6 @@ class App(QWidget):
                     self.sort_by_codvuz_rnw()
                     self.edit_record_nir_form.w.close()
 
-
             self.fin_vuz_model.recalculate_row([edited_row])
             row_to_select = self.nir_model.get_indexes_of_rows(edited_row)
             self.w_root.tableView.selectRow(row_to_select)
@@ -153,10 +155,10 @@ class App(QWidget):
 
     def delete_records_nir(self):
         def accept_delete(rows_to_delete):
-            self.nir_model.delete_rows(rows_to_delete)
+            # self.nir_model.delete_rows(rows_to_delete)
+            self.nir_model.delete_rows(self.w_root.tableView.selectionModel().selectedRows())
             self.fin_vuz_model.recalculate_row(rows_to_delete)
             self.delete_accept_form.w.close()
-
 
         rows_to_delete = []
         for index in self.w_root.tableView.selectionModel().selectedRows():
@@ -166,8 +168,9 @@ class App(QWidget):
             self.delete_accept_form.w_root.pushButton.clicked.connect(lambda: accept_delete(rows_to_delete))
 
     def onNirHeaderClicked(self, index):
+        self.nir_model.setFilter('')
+        self.nir_model.select()
 
-        pass
 
     def sort_by_codvuz_rnw(self):
         self.nir_model.sort_by_codvuz_rnw()

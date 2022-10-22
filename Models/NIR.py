@@ -43,8 +43,12 @@ class NirModel(QSqlTableModel):
 
     def delete_rows(self, rows_to_delete):
         for row in rows_to_delete:
-            QSqlQuery(f"""DELETE FROM TP_nir WHERE codvuz={row['codvuz']} AND rnw='{row['rnw']}'""")
-            self.select()
+            self.removeRow(row.row())
+        self.select()
+        # for row in rows_to_delete:
+        #     QSqlQuery(f"""DELETE FROM TP_nir WHERE codvuz={row['codvuz']} AND rnw='{row['rnw']}'""")
+        #     print(self.query().lastQuery())
+        #     self.select()
 
     def update_row(self, edited_row, changed_codvuz, changed_rnw):
         QSqlQuery(f"""
@@ -60,6 +64,7 @@ class NirModel(QSqlTableModel):
                                     f18={edited_row['f18']}
                                 WHERE codvuz={changed_codvuz} AND rnw='{changed_rnw}';
                         """)
+        print(self.query().lastQuery())
         self.select()
 
     def add_row(self, edited_row) -> bool:
@@ -76,7 +81,6 @@ class NirModel(QSqlTableModel):
             for k in edited_row.keys():
                 if edited_row[k] == '':
                     edited_row[k] = None
-            print(edited_row)
             query = QSqlQuery()
             query.prepare(f"""
                         INSERT INTO Tp_nir(codvuz, rnw, f1, z2, f6, f10, f2, f7, f18)
@@ -103,11 +107,17 @@ class NirModel(QSqlTableModel):
             return 0
 
     def sort_by_codvuz_rnw(self):
+        self.setSort(-1, Qt.SortOrder.AscendingOrder)
+        print(self.selectStatement())
+        self.setFilter(f"""1=1 ORDER BY codvuz, rnw""")
+        self.select()
+
         # print(self.filter())
-        if self.filter():
-            query = QSqlQuery(f"""SELECT * FROM Tp_nir WHERE {self.filter()} ORDER BY codvuz, rnw""")
-        else:
-            query = QSqlQuery(f"""SELECT * FROM Tp_nir ORDER BY codvuz, rnw""")
-        self.setQuery(query)
+        # if self.filter():
+        #     query = QSqlQuery(f"""SELECT * FROM Tp_nir WHERE {self.filter()} ORDER BY codvuz, rnw""")
+        # else:
+        #     query = QSqlQuery(f"""SELECT * FROM Tp_nir ORDER BY codvuz, rnw""")
+        # self.setQuery(query)
+
 
 

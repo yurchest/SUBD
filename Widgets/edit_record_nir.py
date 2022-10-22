@@ -67,6 +67,7 @@ class EditRecordNir(QWidget):
         self.w_root.textEdit_2.setText('')
         self.w_root.lineEdit_8.setText('')
         self.w_root.lineEdit_8.setText('')
+        self.w_root.label_11.setText('')
 
     def get_grnti(self):
         if self.w_root.lineEdit_9.text() == '..':
