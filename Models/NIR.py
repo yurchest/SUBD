@@ -16,7 +16,7 @@ class NirModel(QSqlTableModel):
                    "f18": "Плановый объем \nфинансирования",
                    }
 
-    sortOrder = ['ASC'] * 9
+    sortOrder = ['DESC'] * 9
 
     def __init__(self, db):
         super().__init__()

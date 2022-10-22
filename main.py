@@ -49,6 +49,7 @@ class App(QWidget):
         self.w_root.tableView_3.setModel(self.vuz_model)
 
         # self.w_root.tableView.sortByColumn(3, Qt.SortOrder.AscendingOrder)
+        self.onNirHeaderClicked(3)
         self.w_root.tableView_2.sortByColumn(0, Qt.SortOrder.AscendingOrder)
         self.w_root.tableView_3.sortByColumn(3, Qt.SortOrder.AscendingOrder)
         self.w_root.tableView.horizontalHeader().sectionClicked.connect(self.onNirHeaderClicked)
