@@ -62,5 +62,5 @@ def resize_columns_vuz(vuz_table: QTableView):
 def resize_columns_nir(nir_table):
     for i in range(9):
         nir_table.resizeColumnToContents(i)
-        nir_table.setColumnWidth(i, nir_table.columnWidth(i) + 20)
+        nir_table.setColumnWidth(i, nir_table.columnWidth(i) - 5)
     nir_table.setColumnWidth(6, 200)

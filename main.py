@@ -184,7 +184,6 @@ class App(QWidget):
 
         self.nir_model.update_model()
 
-
     def sort_by_codvuz_rnw(self):
         self.w_root.tableView.scrollTo(self.nir_model.index(0, 0))
         self.w_root.tableView.horizontalHeader().setSortIndicator(0, Qt.SortOrder.AscendingOrder)
