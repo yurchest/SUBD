@@ -223,7 +223,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Плановый оъем финансирования:</string>
+         <string>Плановый объем финансирования:</string>
         </property>
        </widget>
       </item>

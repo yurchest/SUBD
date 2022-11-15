@@ -3,7 +3,9 @@ from PyQt6.QtWidgets import QAbstractItemView, QTableView
 import Models
 
 
-def update_table_views(nir_table: QTableView, fin_vuz_table: QTableView, vuz_table: QTableView ):
+def update_table_views(nir_table: QTableView, fin_vuz_table: QTableView, vuz_table: QTableView):
+    nir_table.verticalHeader().setVisible(False)
+
     # nir_table
     change_columns_nir(nir_table)
     resize_columns_nir(nir_table)
@@ -23,12 +25,13 @@ def update_table_views(nir_table: QTableView, fin_vuz_table: QTableView, vuz_tab
 
 def change_columns_nir(nir_table: QTableView):
     nir_table.horizontalHeader().moveSection(3, 0)
-    nir_table.horizontalHeader().moveSection(4, 1)
-    nir_table.horizontalHeader().moveSection(8, 2)
-    nir_table.horizontalHeader().moveSection(6, 3)
-    nir_table.horizontalHeader().moveSection(7, 4)
-    nir_table.horizontalHeader().moveSection(8, 5)
-    nir_table.horizontalHeader().setFixedHeight(60)
+    nir_table.horizontalHeader().moveSection(2, 1)
+    nir_table.horizontalHeader().moveSection(4, 2)
+    nir_table.horizontalHeader().moveSection(5, 3)
+    nir_table.horizontalHeader().moveSection(8, 4)
+    # nir_table.horizontalHeader().moveSection(8, 5)
+    # nir_table.horizontalHeader().setFixedHeight(60)
+    pass
 
 
 def change_columns_vuz(vuz_table: QTableView):

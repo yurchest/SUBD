@@ -182,6 +182,195 @@
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="page_4">
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>40</y>
+        <width>591</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>20</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Анализ распределения НИР по Вузам</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>90</y>
+        <width>291</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Применяемые фильтры:</string>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="textBrowser">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>100</y>
+        <width>311</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+     </widget>
+     <widget class="QTableView" name="tableView_4">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>230</y>
+        <width>891</width>
+        <height>541</height>
+       </rect>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="page_5">
+     <widget class="QTableView" name="tableView_9">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>230</y>
+        <width>891</width>
+        <height>541</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="textBrowser_3">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>100</y>
+        <width>311</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_12">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>40</y>
+        <width>731</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>20</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Анализ распределения НИР по рубрикам ГРНТИ</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_13">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>90</y>
+        <width>291</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Применяемые фильтры:</string>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="page_11">
+     <widget class="QLabel" name="label_14">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>90</y>
+        <width>271</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Применяемые фильтры:</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_15">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>40</y>
+        <width>681</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>20</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Анализ распределения НИР по характеру НИР</string>
+      </property>
+     </widget>
+     <widget class="QTableView" name="tableView_10">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>230</y>
+        <width>891</width>
+        <height>541</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QTextBrowser" name="textBrowser_4">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>100</y>
+        <width>311</width>
+        <height>101</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>15</pointsize>
+       </font>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -203,8 +392,11 @@
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
-     <string>Анализ</string>
+     <string>Анализ распределения НИР</string>
     </property>
+    <addaction name="action_4"/>
+    <addaction name="action_5"/>
+    <addaction name="action_6"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -223,6 +415,21 @@
   <action name="action_3">
    <property name="text">
     <string>Вузы</string>
+   </property>
+  </action>
+  <action name="action_4">
+   <property name="text">
+    <string>По Вузам</string>
+   </property>
+  </action>
+  <action name="action_5">
+   <property name="text">
+    <string>По рубрикам ГРНТИ</string>
+   </property>
+  </action>
+  <action name="action_6">
+   <property name="text">
+    <string>По характеру НИР</string>
    </property>
   </action>
  </widget>

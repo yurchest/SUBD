@@ -16,7 +16,7 @@ class EditRecordNir(QWidget):
         self.w_root = py_ui.edit_record_nir.Ui_Form()
         self.w_root.setupUi(self.w)
 
-        self.w_root.lineEdit_5.setValidator(QIntValidator())
+        self.w_root.lineEdit_5.setValidator(QIntValidator(0, 2147483647))
         self.w_root.lineEdit_4.setInputMask("00.00.00")
         self.w_root.lineEdit_9.setInputMask("00.00.00")
 
@@ -116,6 +116,3 @@ class EditRecordNir(QWidget):
         return edited_row
 
     # def get_codvuz_from_z1
-
-
-

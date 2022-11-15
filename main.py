@@ -43,10 +43,14 @@ class App(QWidget):
         self.nir_model = Models.NirModel(self.db)
         self.vuz_model = Models.VuzModel(self.db)
         self.fin_vuz_model = Models.FinanceVuzModel(self.db)
+        self.anylyze_by_vuz = Models.AnalyzeByVuz(self.db)
+        self.anylyze_by_grnti = Models.AnalyzeByGRNTI(self.db)
 
         self.w_root.tableView.setModel(self.nir_model)
         self.w_root.tableView_2.setModel(self.fin_vuz_model)
         self.w_root.tableView_3.setModel(self.vuz_model)
+        self.w_root.tableView_4.setModel(self.anylyze_by_vuz)
+        self.w_root.tableView_9.setModel(self.anylyze_by_grnti)
 
         # self.w_root.tableView.sortByColumn(3, Qt.SortOrder.AscendingOrder)
         self.onNirHeaderClicked(3)
@@ -57,6 +61,16 @@ class App(QWidget):
         self.w_root.action_1.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_1))
         self.w_root.action_2.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_2))
         self.w_root.action_3.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_3))
+
+        # Анализ
+        self.w_root.action_4.triggered.connect(lambda: self.anylyze_by_vuz.update(self.nir_model.query().lastQuery()))
+        self.w_root.action_4.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_4))
+
+        self.w_root.action_5.triggered.connect(self.anylyze_by_grnti.update)
+        self.w_root.action_5.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_5))
+
+
+
 
         update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3)
 

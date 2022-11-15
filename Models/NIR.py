@@ -28,11 +28,9 @@ class NirModel(QSqlTableModel):
         self.whereQuery = ''
         self.orderByQuery = ''
 
-
     def change_column_name(self):
         for i in range(self.columnCount()):
             self.setHeaderData(i, Qt.Orientation.Horizontal, self.header_data[self.record().fieldName(i)])
-
 
     def row_from_index(self, index) -> Dict:
         return {'codvuz': self.data(self.index(index.row(), 0)),
@@ -81,6 +79,7 @@ class NirModel(QSqlTableModel):
         if value != 0:
             return False
 
+
         else:
             for k in edited_row.keys():
                 if edited_row[k] == '':
@@ -122,5 +121,3 @@ class NirModel(QSqlTableModel):
     def reset_filters(self):
         self.whereQuery = ''
         self.update_model()
-
-
