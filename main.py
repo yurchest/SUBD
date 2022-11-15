@@ -43,14 +43,16 @@ class App(QWidget):
         self.nir_model = Models.NirModel(self.db)
         self.vuz_model = Models.VuzModel(self.db)
         self.fin_vuz_model = Models.FinanceVuzModel(self.db)
-        self.anylyze_by_vuz = Models.AnalyzeByVuz(self.db)
-        self.anylyze_by_grnti = Models.AnalyzeByGRNTI(self.db)
+        self.anylyze_by_vuz = Models.AnalyzeByVuz(self.db, self.w_root)
+        self.anylyze_by_grnti = Models.AnalyzeByGRNTI(self.db, self.w_root)
+        self.anylyze_by_char = Models.AnalyzeByCHAR(self.db, self.w_root)
 
         self.w_root.tableView.setModel(self.nir_model)
         self.w_root.tableView_2.setModel(self.fin_vuz_model)
         self.w_root.tableView_3.setModel(self.vuz_model)
         self.w_root.tableView_4.setModel(self.anylyze_by_vuz)
         self.w_root.tableView_9.setModel(self.anylyze_by_grnti)
+        self.w_root.tableView_10.setModel(self.anylyze_by_char)
 
         # self.w_root.tableView.sortByColumn(3, Qt.SortOrder.AscendingOrder)
         self.onNirHeaderClicked(3)
@@ -62,21 +64,25 @@ class App(QWidget):
         self.w_root.action_2.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_2))
         self.w_root.action_3.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_3))
 
-        # Анализ
-        self.w_root.action_4.triggered.connect(lambda: self.anylyze_by_vuz.update(self.nir_model.query().lastQuery()))
-        self.w_root.action_4.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_4))
-
-        self.w_root.action_5.triggered.connect(self.anylyze_by_grnti.update)
-        self.w_root.action_5.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_5))
-
-
-
-
-        update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3)
+        update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3,
+                           self.w_root.tableView_4, self.w_root.tableView_9, self.w_root.tableView_10)
 
         self.delete_accept_form = Widgets.DeleteAccept()
         self.edit_record_nir_form = Widgets.EditRecordNir()
         self.filter_nir_form = Widgets.FilterNir(self.vuz_model, self.nir_model)
+
+        # Анализ
+        self.w_root.action_4.triggered.connect(
+            lambda: self.anylyze_by_vuz.update(self.nir_model.query().lastQuery(), self.filter_nir_form))
+        self.w_root.action_4.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_4))
+
+        self.w_root.action_5.triggered.connect(
+            lambda: self.anylyze_by_grnti.update(self.nir_model.query().lastQuery(), self.filter_nir_form))
+        self.w_root.action_5.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_5))
+
+        self.w_root.action_6.triggered.connect(
+            lambda: self.anylyze_by_char.update(self.nir_model.query().lastQuery(), self.filter_nir_form))
+        self.w_root.action_6.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_11))
 
         self.w_root.pushButton.clicked.connect(self.open_edit_record_nir)
         self.w_root.pushButton_3.clicked.connect(self.delete_records_nir)

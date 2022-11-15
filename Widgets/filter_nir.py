@@ -138,7 +138,7 @@ class FilterNir(QWidget):
                                 AND oblname LIKE '{self.w_root.comboBox_3.currentText()}%'
                                 ) 
                                 AND (SUBSTR(f10, 1, 2)  LIKE '%{self.w_root.lineEdit.text()}%'
-                                OR SUBSTR(f10, 10, 11) LIKE '%{self.w_root.lineEdit.text()}%')
+                                OR SUBSTR(f10, 10, 2) LIKE '%{self.w_root.lineEdit.text()}%')
                                 """)
 
         query = QSqlQuery(f"""SELECT * FROM Tp_nir 
