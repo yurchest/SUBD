@@ -3,7 +3,8 @@ from PyQt6.QtWidgets import QAbstractItemView, QTableView
 import Models
 
 
-def update_table_views(nir_table: QTableView, fin_vuz_table: QTableView, vuz_table: QTableView, analyze_vuz, analyze_grnti, analyze_char):
+def update_table_views(nir_table: QTableView, fin_vuz_table: QTableView, vuz_table: QTableView, analyze_vuz,
+                       analyze_grnti, analyze_char):
     nir_table.verticalHeader().setVisible(False)
 
     # nir_table
@@ -30,20 +31,25 @@ def update_table_views(nir_table: QTableView, fin_vuz_table: QTableView, vuz_tab
     resize_columns_analyze_char(analyze_char)
 
 
+
 def resize_columns_analyze_vuz(analyze_vuz: QTableView):
     for i in range(4):
         analyze_vuz.resizeColumnToContents(i)
         analyze_vuz.setColumnWidth(i, analyze_vuz.columnWidth(i) + 50)
 
+
 def resize_columns_analyze_grnti(analyze_grnti: QTableView):
     for i in range(4):
         analyze_grnti.resizeColumnToContents(i)
         analyze_grnti.setColumnWidth(i, analyze_grnti.columnWidth(i) + 50)
+    analyze_grnti.setColumnWidth(1, 400)
+
 
 def resize_columns_analyze_char(analyze_char: QTableView):
     for i in range(4):
         analyze_char.resizeColumnToContents(i)
         analyze_char.setColumnWidth(i, analyze_char.columnWidth(i) + 50)
+
 
 def change_columns_nir(nir_table: QTableView):
     nir_table.horizontalHeader().moveSection(3, 0)
