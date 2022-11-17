@@ -23,8 +23,8 @@ def update_table_views(nir_table: QTableView, fin_vuz_table: QTableView, vuz_tab
     change_columns_fin_vuz(fin_vuz_table)
     resize_columns_fin_vuz(fin_vuz_table)
 
-    analyze_vuz.verticalHeader().setVisible(False)
-    analyze_grnti.verticalHeader().setVisible(False)
+    # analyze_vuz.verticalHeader().setVisible(False)
+    # analyze_grnti.verticalHeader().setVisible(False)
     analyze_char.verticalHeader().setVisible(False)
     resize_columns_analyze_vuz(analyze_vuz)
     resize_columns_analyze_grnti(analyze_grnti)
