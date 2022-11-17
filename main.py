@@ -3,8 +3,9 @@ import os
 
 from PyQt6.QtGui import QIntValidator
 from dotenv import load_dotenv
+import xlwt
 
-from PyQt6 import QtWidgets
+from PyQt6 import QtWidgets, QtGui
 from PyQt6.QtCore import pyqtSignal, QSortFilterProxyModel
 from PyQt6.QtSql import QSqlDatabase, QSqlQuery
 from PyQt6.QtWidgets import QApplication, QWidget, QMessageBox, QAbstractItemView
@@ -12,6 +13,7 @@ from UI import py_ui
 from utils.update_table_views import update_table_views
 import Models
 from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QFileDialog
 
 # from Widgets.edit_record_nir import EditRecordNir
 import Widgets
@@ -51,8 +53,8 @@ class App(QWidget):
         self.w_root.tableView_2.setModel(self.fin_vuz_model)
         self.w_root.tableView_3.setModel(self.vuz_model)
         self.w_root.tableView_4.setModel(self.anylyze_by_vuz)
-        self.w_root.tableView_9.setModel(self.anylyze_by_grnti)
-        self.w_root.tableView_10.setModel(self.anylyze_by_char)
+        self.w_root.tableView_11.setModel(self.anylyze_by_grnti)
+        self.w_root.tableView_12.setModel(self.anylyze_by_char)
 
         # self.w_root.tableView.sortByColumn(3, Qt.SortOrder.AscendingOrder)
         self.onNirHeaderClicked(3)
@@ -65,24 +67,17 @@ class App(QWidget):
         self.w_root.action_3.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_3))
 
         update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3,
-                           self.w_root.tableView_4, self.w_root.tableView_9, self.w_root.tableView_10)
+                           self.w_root.tableView_4, self.w_root.tableView_11, self.w_root.tableView_12)
 
         self.delete_accept_form = Widgets.DeleteAccept()
         self.edit_record_nir_form = Widgets.EditRecordNir()
         self.filter_nir_form = Widgets.FilterNir(self.vuz_model, self.nir_model)
 
         # Анализ
-        self.w_root.action_4.triggered.connect(
-            lambda: self.anylyze_by_vuz.update(self.nir_model.query().lastQuery(), self.filter_nir_form))
-        self.w_root.action_4.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_4))
+        self.w_root.action_7.triggered.connect(self.open_analyze)
+        self.w_root.action_7.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_4))
 
-        self.w_root.action_5.triggered.connect(
-            lambda: self.anylyze_by_grnti.update(self.nir_model.query().lastQuery(), self.filter_nir_form))
-        self.w_root.action_5.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_5))
 
-        self.w_root.action_6.triggered.connect(
-            lambda: self.anylyze_by_char.update(self.nir_model.query().lastQuery(), self.filter_nir_form))
-        self.w_root.action_6.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_11))
 
         self.w_root.pushButton.clicked.connect(self.open_edit_record_nir)
         self.w_root.pushButton_3.clicked.connect(self.delete_records_nir)
@@ -92,6 +87,35 @@ class App(QWidget):
         self.w_root.pushButton_6.clicked.connect(self.reset_filters)
 
         self.w.show()
+
+
+    def set_analyze_filters(self, filter_widget):
+        if filter_widget:
+            text = f"Федеральный округ: {filter_widget.w_root.comboBox_2.currentText()}\n" \
+                   f"Субъект федерации: {filter_widget.w_root.comboBox_3.currentText()}\n" \
+                   f"Город: {filter_widget.w_root.comboBox_4.currentText()}\n" \
+                   f"ВУЗ: {filter_widget.w_root.comboBox_5.currentText()}\n" \
+                   f"Первые цифры кода ГРНТИ: {filter_widget.w_root.lineEdit.text()}\n"
+
+            self.w_root.textBrowser.setText(text)
+
+    def set_anlyze_sum(self, last_query):
+        query = QSqlQuery(f"""
+                                    SELECT COUNT(*), SUM(f18) FROM ({last_query})
+                                    """)
+        while query.next():
+            amount_of_nirs = query.value(0)
+            sum_fin = query.value(1)
+
+        self.w_root.label_9.setText(str(amount_of_nirs))
+        self.w_root.label_10.setText(str(sum_fin))
+
+    def open_analyze(self):
+        self.set_analyze_filters(self.filter_nir_form)
+        self.set_anlyze_sum(self.nir_model.query().lastQuery())
+        self.anylyze_by_vuz.update(self.nir_model.query().lastQuery())
+        self.anylyze_by_grnti.update(self.nir_model.query().lastQuery())
+        self.anylyze_by_char.update(self.nir_model.query().lastQuery())
 
     def reset_filters(self):
         self.nir_model.reset_filters()

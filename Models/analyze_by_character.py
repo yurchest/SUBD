@@ -19,7 +19,7 @@ class AnalyzeByCHAR(QSqlQueryModel):
         for i in range(self.columnCount()):
             self.setHeaderData(i, Qt.Orientation.Horizontal, self.header_data[self.record().fieldName(i)])
 
-    def update(self, last_query="""SELECT * FROM Tp_nir""", filter_widget=None):
+    def update(self, last_query="""SELECT * FROM Tp_nir"""):
 
         self.setQuery(f"""
                             WITH my_values(f1, f2) AS (
@@ -32,23 +32,4 @@ class AnalyzeByCHAR(QSqlQueryModel):
                             ON my_values.f2 = Tp_nir.f1
                             GROUP BY my_values.f1
                         """)
-
-        query = QSqlQuery(f"""
-                            SELECT COUNT(*), SUM(f18) FROM ({last_query})
-                            """)
-        while query.next():
-            amount_of_nirs = query.value(0)
-            sum_fin = query.value(1)
-
-        self.main_app.label_20.setText(str(amount_of_nirs))
-        self.main_app.label_22.setText(str(sum_fin))
-
-        if filter_widget:
-            text = f"Федеральный округ: {filter_widget.w_root.comboBox_2.currentText()}\n" \
-                   f"Субъект федерации: {filter_widget.w_root.comboBox_3.currentText()}\n" \
-                   f"Город: {filter_widget.w_root.comboBox_4.currentText()}\n" \
-                   f"ВУЗ: {filter_widget.w_root.comboBox_5.currentText()}\n" \
-                   f"Первые цифры кода ГРНТИ: {filter_widget.w_root.lineEdit.text()}\n"
-
-            self.main_app.textBrowser_4.setText(text)
 
