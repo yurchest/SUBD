@@ -3,7 +3,7 @@ from PyQt6.QtCore import Qt
 
 
 class AnalyzeByVuz(QSqlQueryModel):
-    header_data = {'codvuz': "Код \nвуза",
+    header_data = {'z2': "Наименование \nвуза",
                    "kolvo": "Кол-во \nНИР",
                    "sum": "Плановый объем \nфинансирования",
                    }
@@ -21,13 +21,21 @@ class AnalyzeByVuz(QSqlQueryModel):
 
     def update(self, last_query=f"""SELECT * FROM Tp_nir""", filter_widget=None):
 
-        self.setQuery(f"""SELECT VUZ.codvuz,
-                    COUNT(Tp_nir.codvuz) as kolvo,
-                    COALESCE(sum(Tp_nir.f18), 0)as sum 
-                    FROM VUZ LEFT JOIN ({last_query}) as Tp_nir
-                    ON VUZ.codvuz = Tp_nir.codvuz
-                    GROUP BY VUZ.codvuz
-                    """)
+        # self.setQuery(f"""SELECT VUZ.codvuz,
+        #             COUNT(Tp_nir.codvuz) as kolvo,
+        #             COALESCE(sum(Tp_nir.f18), 0) as sum
+        #             FROM VUZ LEFT JOIN ({last_query}) as Tp_nir
+        #             ON VUZ.codvuz = Tp_nir.codvuz
+        #             GROUP BY VUZ.codvuz
+        #             """)
+
+        self.setQuery(f"""
+                            SELECT Tp_nir.z2,
+                            COUNT(Tp_nir.codvuz) as kolvo,
+                            COALESCE(sum(Tp_nir.f18), 0) as sum
+                            FROM ({last_query}) as Tp_nir
+                            GROUP BY Tp_nir.z2
+                        """)
 
         query = QSqlQuery(f"""
                             SELECT COUNT(*), SUM(f18) FROM ({last_query})

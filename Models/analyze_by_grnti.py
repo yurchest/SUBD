@@ -27,7 +27,7 @@ class AnalyzeByGRNTI(QSqlQueryModel):
                         rubrika,
                         COUNT(Tp_Nir.codvuz) as kolvo,
                         COALESCE(sum(Tp_Nir.f18), 0)as sum 
-                        FROM grntirub LEFT JOIN ({last_query}) as Tp_nir
+                        FROM grntirub INNER JOIN ({last_query}) as Tp_nir
                         ON (grntirub.codrub = SUBSTR(Tp_nir.f10, 1, 2)
                         OR grntirub.codrub = SUBSTR(Tp_nir.f10, 10, 2))
                         GROUP BY grntirub.codrub

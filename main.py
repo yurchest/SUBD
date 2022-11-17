@@ -89,9 +89,13 @@ class App(QWidget):
         self.w_root.pushButton_2.clicked.connect(self.add_record_nir_form)
         self.w_root.pushButton_4.clicked.connect(self.open_filter_form)
         self.w_root.pushButton_5.clicked.connect(self.sort_by_codvuz_rnw)
-        self.w_root.pushButton_6.clicked.connect(self.nir_model.reset_filters)
+        self.w_root.pushButton_6.clicked.connect(self.reset_filters)
 
         self.w.show()
+
+    def reset_filters(self):
+        self.nir_model.reset_filters()
+        self.filter_nir_form.reset()
 
     def open_filter_form(self):
         # self.filter_nir_form.reset()
