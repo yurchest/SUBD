@@ -8,12 +8,12 @@ import xlwt
 from PyQt6 import QtWidgets, QtGui
 from PyQt6.QtCore import pyqtSignal, QSortFilterProxyModel
 from PyQt6.QtSql import QSqlDatabase, QSqlQuery
-from PyQt6.QtWidgets import QApplication, QWidget, QMessageBox, QAbstractItemView
+from PyQt6.QtWidgets import QApplication, QWidget, QMessageBox, QFileDialog
 from UI import py_ui
 from utils.update_table_views import update_table_views
 import Models
 from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QFileDialog
+from docx import Document
 
 # from Widgets.edit_record_nir import EditRecordNir
 import Widgets
@@ -77,17 +77,49 @@ class App(QWidget):
         self.w_root.action_7.triggered.connect(self.open_analyze)
         self.w_root.action_7.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_4))
 
-
-
         self.w_root.pushButton.clicked.connect(self.open_edit_record_nir)
         self.w_root.pushButton_3.clicked.connect(self.delete_records_nir)
         self.w_root.pushButton_2.clicked.connect(self.add_record_nir_form)
         self.w_root.pushButton_4.clicked.connect(self.open_filter_form)
         self.w_root.pushButton_5.clicked.connect(self.sort_by_codvuz_rnw)
         self.w_root.pushButton_6.clicked.connect(self.reset_filters)
+        self.w_root.pushButton_13.clicked.connect(lambda: self.save_to_doc(self.anylyze_by_vuz, 'по вузам'))
+        self.w_root.pushButton_15.clicked.connect(lambda: self.save_to_doc(self.anylyze_by_grnti, 'по ГРНТИ'))
+        self.w_root.pushButton_14.clicked.connect(lambda: self.save_to_doc(self.anylyze_by_char, 'по характеру НИР'))
 
         self.w.show()
 
+    def save_to_doc(self, model: Models, text):
+        records = []
+        document = Document()
+        document.add_heading(f"Распределение НИР {text}", 0)
+        document.add_paragraph(f"Фильтры: \n {self.w_root.textBrowser.toPlainText()}")
+        query = QSqlQuery(model.query().lastQuery())
+        while query.next():
+            row = []
+            for i in range(model.columnCount()):
+                row.append(query.value(i))
+            records.append(row)
+        table = document.add_table(rows=1, cols=model.columnCount(), style="Table Grid")
+        row = table.rows[0].cells
+        for i in range(model.columnCount()):
+            row[i].text = model.headerData(i, Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole)
+
+        for row in records:
+            cells = table.add_row().cells
+            for i, item in enumerate(row):
+                cells[i].text = str(item)
+        # cells = table.add_row().cells
+        # cells[0].text = 'Итого'
+        # cells[1].text =str(self.w_root.label_9.text())
+        # cells[2].text =str(self.w_root.label_10.text())
+
+        document.add_paragraph(f"\nОбщее кол-во нир: {self.w_root.label_9.text()}")
+        document.add_paragraph(f"Суммарный объем финансирования: {self.w_root.label_10.text()}")
+
+        filename, _ = QFileDialog.getSaveFileName(
+            None, 'Save Doc', os.getcwd())
+        document.save(filename)
 
     def set_analyze_filters(self, filter_widget):
         if filter_widget:
