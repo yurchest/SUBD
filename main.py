@@ -1,12 +1,13 @@
+import math
 import sys
 import os
 
-from PyQt6.QtGui import QIntValidator, QDoubleValidator
+from PyQt6.QtGui import QIntValidator, QDoubleValidator, QRegularExpressionValidator
 from dotenv import load_dotenv
 import xlwt
 
-from PyQt6 import QtWidgets, QtGui
-from PyQt6.QtCore import pyqtSignal, QSortFilterProxyModel
+from PyQt6 import QtWidgets, QtGui, QtCore
+from PyQt6.QtCore import pyqtSignal, QSortFilterProxyModel, QRegularExpression
 from PyQt6.QtSql import QSqlDatabase, QSqlQuery
 from PyQt6.QtWidgets import QApplication, QWidget, QMessageBox, QFileDialog
 from UI import py_ui
@@ -39,6 +40,7 @@ class App(QWidget):
         self.w = QtWidgets.QMainWindow()
         self.w_root = py_ui.form.Ui_MainWindow()
         self.w_root.setupUi(self.w)
+        self.w.setWindowTitle("Управление организацией НИР")
 
         self.db = connect_db(os.getenv('DB_URL'))
 
@@ -69,7 +71,8 @@ class App(QWidget):
         self.w_root.action_3.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_3))
 
         update_table_views(self.w_root.tableView, self.w_root.tableView_2, self.w_root.tableView_3,
-                           self.w_root.tableView_4, self.w_root.tableView_11, self.w_root.tableView_12)
+                           self.w_root.tableView_4, self.w_root.tableView_11, self.w_root.tableView_12,
+                           self.w_root.tableView_17)
 
         self.delete_accept_form = Widgets.DeleteAccept()
         self.edit_record_nir_form = Widgets.EditRecordNir()
@@ -93,38 +96,90 @@ class App(QWidget):
         self.w_root.pushButton_15.clicked.connect(lambda: self.save_to_doc(self.anylyze_by_grnti, 'по ГРНТИ'))
         self.w_root.pushButton_14.clicked.connect(lambda: self.save_to_doc(self.anylyze_by_char, 'по характеру НИР'))
         self.w_root.pushButton_19.clicked.connect(lambda: self.finance_order.update(self.w_root.lineEdit_6.text()))
+        self.w_root.pushButton_20.clicked.connect(self.accept_finance_order)
+        self.w_root.pushButton_21.clicked.connect(self.save_to_doc_finance)
 
-        self.w_root.lineEdit_4.textChanged.connect(self.sum_changed)
-        self.w_root.lineEdit_6.textChanged.connect(self.perc_changed)
 
-        self.w_root.lineEdit_4.setValidator(QDoubleValidator(0, float('inf'), 0))
+        self.w_root.lineEdit_4.textEdited.connect(self.sum_changed)
+        self.w_root.lineEdit_6.textEdited.connect(self.perc_changed)
+
+        regex = QRegularExpression("[1-9]\\d{0,20}")
+        validator = QRegularExpressionValidator(regex)
+        self.w_root.lineEdit_4.setValidator(validator)
+        # self.w_root.lineEdit_4.setInputMask("9")
         self.w_root.lineEdit_6.setValidator(QDoubleValidator(0, float('inf'), 3))
 
         self.w.show()
+
+    def save_to_doc_finance(self):
+        records = []
+        document = Document()
+        document.add_heading(f"Распоряжение о финансировании Вузов", 0)
+        query = QSqlQuery(self.finance_order.query().lastQuery())
+        while query.next():
+            row = []
+            for i in range(self.finance_order.columnCount()):
+                row.append(query.value(i))
+            records.append(row)
+        table = document.add_table(rows=1, cols=self.finance_order.columnCount(), style="Table Grid")
+        row = table.rows[0].cells
+        for i in range(self.finance_order.columnCount()):
+            row[i].text = self.finance_order.headerData(i, Qt.Orientation.Horizontal, Qt.ItemDataRole.DisplayRole)
+
+        for row in records:
+            cells = table.add_row().cells
+            for i, item in enumerate(row):
+                cells[i].text = str(item)
+
+
+        query = QSqlQuery(f""" SELECT SUM(z3) FROM ({self.finance_order.query().lastQuery()})""")
+        while query.next():
+            summa = query.value(0)
+
+
+        cells = table.add_row().cells
+        cells[0].text = "Итого"
+        cells[1].text = str(summa)
+
+        filename, _ = QFileDialog.getSaveFileName(
+            None, 'Save Doc', os.getcwd())
+        if filename:
+            document.save(filename)
+
+    def accept_finance_order(self):
+        print(self.finance_order.query().lastQuery())
+        QSqlQuery(f"""UPDATE Tp_fv
+                        SET z18 = table2.z3
+                        FROM ({self.finance_order.query().lastQuery()}) AS table2
+                        WHERE Tp_fv.z2 = table2.z2""")
+        self.fin_vuz_model.update()
+        self.set_reference()
 
     def sum_changed(self, text):
         if text:
             try:
                 percent = int(text) / int(self.w_root.lineEdit.text())
-                self.w_root.lineEdit_6.setText(str(percent))
+                self.w_root.lineEdit_6.setText(str(percent * 100))
             except:
                 pass
 
     def perc_changed(self, text):
         if text:
             try:
-                sum = float(text) * int(self.w_root.lineEdit.text())
-                self.w_root.lineEdit_4.setText(str(sum))
+                sum = float(text) * 0.01 * int(self.w_root.lineEdit.text())
+                self.w_root.lineEdit_4.setText(str(int(sum)))
             except:
                 pass
 
     def open_finance(self):
+        self.set_reference()
 
+    def set_reference(self):
         sum_plan_fin, sum_fact_fin, percent = self.get_sum_plan_fact_percent()
 
         self.w_root.lineEdit.setText(str(sum_plan_fin))
         self.w_root.lineEdit_2.setText(str(sum_fact_fin))
-        self.w_root.lineEdit_5.setText(str(percent))
+        self.w_root.lineEdit_5.setText(str(percent * 100))
 
     def get_sum_plan_fact_percent(self):
         query = QSqlQuery(f"""

@@ -44,3 +44,4 @@ class FinanceVuzModel(QSqlTableModel):
             """)
         self.update()
 
+

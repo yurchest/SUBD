@@ -1,6 +1,7 @@
 from typing import Dict
 
-from PyQt6.QtGui import QIntValidator
+from PyQt6.QtCore import QRegularExpression
+from PyQt6.QtGui import QIntValidator, QRegularExpressionValidator
 
 from UI import py_ui
 from PyQt6.QtWidgets import QWidget
@@ -16,7 +17,7 @@ class EditRecordNir(QWidget):
         self.w_root = py_ui.edit_record_nir.Ui_Form()
         self.w_root.setupUi(self.w)
 
-        self.w_root.lineEdit_5.setValidator(QIntValidator(0, 2147483647))
+        self.w_root.lineEdit_5.setValidator(QRegularExpressionValidator(QRegularExpression("[1-9]\\d{0,20}")))
         self.w_root.lineEdit_4.setInputMask("00.00.00")
         self.w_root.lineEdit_9.setInputMask("00.00.00")
 

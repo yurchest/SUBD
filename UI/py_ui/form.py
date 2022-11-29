@@ -56,7 +56,7 @@ class Ui_MainWindow(object):
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.pushButton_6 = QtWidgets.QPushButton(self.page_1)
-        self.pushButton_6.setGeometry(QtCore.QRect(400, 880, 121, 21))
+        self.pushButton_6.setGeometry(QtCore.QRect(420, 880, 121, 21))
         font = QtGui.QFont()
         font.setFamily("DejaVu Sans")
         font.setPointSize(9)
@@ -473,7 +473,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menu_3.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(6)
+        self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -492,7 +492,7 @@ class Ui_MainWindow(object):
         self.label_5.setText(_translate("MainWindow", "Анализ распределения НИР по Вузам"))
         self.label_6.setText(_translate("MainWindow", "Применяемые фильтры:"))
         self.label_7.setText(_translate("MainWindow", "Общее кол-во НИР :"))
-        self.label_8.setText(_translate("MainWindow", "Суммарный объем финансирования :"))
+        self.label_8.setText(_translate("MainWindow", "Суммарный плановый объем финансирования :"))
         self.label_24.setText(_translate("MainWindow", "Анализ распределения НИР по рубрикам ГРНТИ"))
         self.label_25.setText(_translate("MainWindow", "Анализ распределения НИР по характеру НИР"))
         self.pushButton_13.setText(_translate("MainWindow", "Сохранить в файл"))

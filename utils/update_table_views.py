@@ -11,9 +11,12 @@ class AlignDelegate(QtWidgets.QStyledItemDelegate):
 
 
 def update_table_views(nir_table: QTableView, fin_vuz_table: QTableView, vuz_table: QTableView, analyze_vuz: QTableView,
-                       analyze_grnti: QTableView, analyze_char: QTableView) -> object:
+                       analyze_grnti: QTableView, analyze_char: QTableView, fin_order: QTableView) -> object:
+    fin_order.setColumnWidth(0, 300)
+    fin_order.setColumnWidth(1, 300)
 
     delegate = AlignDelegate(analyze_vuz)
+    fin_order.setItemDelegateForColumn(1, delegate)
     analyze_vuz.setItemDelegateForColumn(1, delegate)
     analyze_vuz.setItemDelegateForColumn(2, delegate)
     analyze_grnti.setItemDelegateForColumn(2, delegate)
