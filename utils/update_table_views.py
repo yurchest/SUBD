@@ -23,12 +23,17 @@ def update_table_views(nir_table: QTableView, fin_vuz_table: QTableView, vuz_tab
     analyze_grnti.setItemDelegateForColumn(3, delegate)
     analyze_char.setItemDelegateForColumn(1, delegate)
     analyze_char.setItemDelegateForColumn(2, delegate)
+    fin_vuz_table.setItemDelegateForColumn(2, delegate)
+    fin_vuz_table.setItemDelegateForColumn(3, delegate)
+    fin_vuz_table.setItemDelegateForColumn(4, delegate)
     nir_table.verticalHeader().setVisible(False)
 
     # nir_table
     change_columns_nir(nir_table)
     resize_columns_nir(nir_table)
     nir_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+    fin_vuz_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+    # nir_table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
 
     # vuz_table
     vuz_table.setSortingEnabled(True)

@@ -304,7 +304,7 @@
        <rect>
         <x>20</x>
         <y>870</y>
-        <width>411</width>
+        <width>521</width>
         <height>41</height>
        </rect>
       </property>
@@ -340,7 +340,7 @@
      <widget class="QLabel" name="label_10">
       <property name="geometry">
        <rect>
-        <x>420</x>
+        <x>530</x>
         <y>870</y>
         <width>201</width>
         <height>41</height>
