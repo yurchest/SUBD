@@ -1,10 +1,25 @@
+from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtWidgets import QAbstractItemView, QTableView
 
 import Models
 
 
-def update_table_views(nir_table: QTableView, fin_vuz_table: QTableView, vuz_table: QTableView, analyze_vuz,
-                       analyze_grnti, analyze_char):
+class AlignDelegate(QtWidgets.QStyledItemDelegate):
+    def initStyleOption(self, option, index):
+        super(AlignDelegate, self).initStyleOption(option, index)
+        option.displayAlignment = QtCore.Qt.AlignmentFlag.AlignRight
+
+
+def update_table_views(nir_table: QTableView, fin_vuz_table: QTableView, vuz_table: QTableView, analyze_vuz: QTableView,
+                       analyze_grnti: QTableView, analyze_char: QTableView) -> object:
+
+    delegate = AlignDelegate(analyze_vuz)
+    analyze_vuz.setItemDelegateForColumn(1, delegate)
+    analyze_vuz.setItemDelegateForColumn(2, delegate)
+    analyze_grnti.setItemDelegateForColumn(2, delegate)
+    analyze_grnti.setItemDelegateForColumn(3, delegate)
+    analyze_char.setItemDelegateForColumn(1, delegate)
+    analyze_char.setItemDelegateForColumn(2, delegate)
     nir_table.verticalHeader().setVisible(False)
 
     # nir_table
@@ -29,7 +44,6 @@ def update_table_views(nir_table: QTableView, fin_vuz_table: QTableView, vuz_tab
     resize_columns_analyze_vuz(analyze_vuz)
     resize_columns_analyze_grnti(analyze_grnti)
     resize_columns_analyze_char(analyze_char)
-
 
 
 def resize_columns_analyze_vuz(analyze_vuz: QTableView):

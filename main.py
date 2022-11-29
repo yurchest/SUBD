@@ -1,7 +1,7 @@
 import sys
 import os
 
-from PyQt6.QtGui import QIntValidator
+from PyQt6.QtGui import QIntValidator, QDoubleValidator
 from dotenv import load_dotenv
 import xlwt
 
@@ -48,6 +48,7 @@ class App(QWidget):
         self.anylyze_by_vuz = Models.AnalyzeByVuz(self.db, self.w_root)
         self.anylyze_by_grnti = Models.AnalyzeByGRNTI(self.db, self.w_root)
         self.anylyze_by_char = Models.AnalyzeByCHAR(self.db, self.w_root)
+        self.finance_order = Models.FinanceOrder(self.db)
 
         self.w_root.tableView.setModel(self.nir_model)
         self.w_root.tableView_2.setModel(self.fin_vuz_model)
@@ -55,6 +56,7 @@ class App(QWidget):
         self.w_root.tableView_4.setModel(self.anylyze_by_vuz)
         self.w_root.tableView_11.setModel(self.anylyze_by_grnti)
         self.w_root.tableView_12.setModel(self.anylyze_by_char)
+        self.w_root.tableView_17.setModel(self.finance_order)
 
         # self.w_root.tableView.sortByColumn(3, Qt.SortOrder.AscendingOrder)
         self.onNirHeaderClicked(3)
@@ -77,6 +79,10 @@ class App(QWidget):
         self.w_root.action_7.triggered.connect(self.open_analyze)
         self.w_root.action_7.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_4))
 
+        # Финансирование
+        self.w_root.action_8.triggered.connect(lambda: self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_12))
+        self.w_root.action_8.triggered.connect(self.open_finance)
+
         self.w_root.pushButton.clicked.connect(self.open_edit_record_nir)
         self.w_root.pushButton_3.clicked.connect(self.delete_records_nir)
         self.w_root.pushButton_2.clicked.connect(self.add_record_nir_form)
@@ -86,8 +92,57 @@ class App(QWidget):
         self.w_root.pushButton_13.clicked.connect(lambda: self.save_to_doc(self.anylyze_by_vuz, 'по вузам'))
         self.w_root.pushButton_15.clicked.connect(lambda: self.save_to_doc(self.anylyze_by_grnti, 'по ГРНТИ'))
         self.w_root.pushButton_14.clicked.connect(lambda: self.save_to_doc(self.anylyze_by_char, 'по характеру НИР'))
+        self.w_root.pushButton_19.clicked.connect(lambda: self.finance_order.update(self.w_root.lineEdit_6.text()))
+
+        self.w_root.lineEdit_4.textChanged.connect(self.sum_changed)
+        self.w_root.lineEdit_6.textChanged.connect(self.perc_changed)
+
+        self.w_root.lineEdit_4.setValidator(QDoubleValidator(0, float('inf'), 0))
+        self.w_root.lineEdit_6.setValidator(QDoubleValidator(0, float('inf'), 3))
 
         self.w.show()
+
+    def sum_changed(self, text):
+        if text:
+            try:
+                percent = int(text) / int(self.w_root.lineEdit.text())
+                self.w_root.lineEdit_6.setText(str(percent))
+            except:
+                pass
+
+    def perc_changed(self, text):
+        if text:
+            try:
+                sum = float(text) * int(self.w_root.lineEdit.text())
+                self.w_root.lineEdit_4.setText(str(sum))
+            except:
+                pass
+
+    def open_finance(self):
+
+        sum_plan_fin, sum_fact_fin, percent = self.get_sum_plan_fact_percent()
+
+        self.w_root.lineEdit.setText(str(sum_plan_fin))
+        self.w_root.lineEdit_2.setText(str(sum_fact_fin))
+        self.w_root.lineEdit_5.setText(str(percent))
+
+    def get_sum_plan_fact_percent(self):
+        query = QSqlQuery(f"""
+                                SELECT SUM(f18) FROM ({self.nir_model.query().lastQuery()})
+                                """)
+        while query.next():
+            sum_plan_fin = query.value(0)
+
+        query = QSqlQuery(f"""
+                                    SELECT SUM(z18) FROM TP_fv
+                                    """)
+
+        while query.next():
+            sum_fact_fin = query.value(0)
+
+        percent = sum_fact_fin / sum_plan_fin
+
+        return (sum_plan_fin, sum_fact_fin, percent)
 
     def save_to_doc(self, model: Models, text):
         records = []
@@ -119,7 +174,8 @@ class App(QWidget):
 
         filename, _ = QFileDialog.getSaveFileName(
             None, 'Save Doc', os.getcwd())
-        document.save(filename)
+        if filename:
+            document.save(filename)
 
     def set_analyze_filters(self, filter_widget):
         if filter_widget:
