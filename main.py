@@ -4,7 +4,6 @@ import os
 
 from PyQt6.QtGui import QIntValidator, QDoubleValidator, QRegularExpressionValidator
 from dotenv import load_dotenv
-import xlwt
 
 from PyQt6 import QtWidgets, QtGui, QtCore
 from PyQt6.QtCore import pyqtSignal, QSortFilterProxyModel, QRegularExpression
@@ -99,7 +98,6 @@ class App(QWidget):
         self.w_root.pushButton_20.clicked.connect(self.accept_finance_order)
         self.w_root.pushButton_21.clicked.connect(self.save_to_doc_finance)
 
-
         self.w_root.lineEdit_4.textEdited.connect(self.sum_changed)
         self.w_root.lineEdit_6.textEdited.connect(self.perc_changed)
 
@@ -131,18 +129,16 @@ class App(QWidget):
             for i, item in enumerate(row):
                 cells[i].text = str(item)
 
-
         query = QSqlQuery(f""" SELECT SUM(z3) FROM ({self.finance_order.query().lastQuery()})""")
         while query.next():
             summa = query.value(0)
-
 
         cells = table.add_row().cells
         cells[0].text = "Итого"
         cells[1].text = str(summa)
 
         filename, _ = QFileDialog.getSaveFileName(
-            None, 'Save Doc', os.getcwd())
+            None, 'Save Doc', os.getcwd(), "*.doc")
         if filename:
             document.save(filename)
 
@@ -228,7 +224,7 @@ class App(QWidget):
         document.add_paragraph(f"Суммарный объем финансирования: {self.w_root.label_10.text()}")
 
         filename, _ = QFileDialog.getSaveFileName(
-            None, 'Save Doc', os.getcwd())
+            None, 'Save Doc', os.getcwd(), "*.doc")
         if filename:
             document.save(filename)
 
