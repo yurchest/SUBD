@@ -5,7 +5,7 @@ from PyQt6.QtCore import Qt
 class FinanceOrder(QSqlQueryModel):
     header_data = {
         "z2": "ВУЗ",
-        "z3": "Фактический \nобъем",
+        "z5": "Фактический \nобъем",
     }
 
     def __init__(self, db):
@@ -22,10 +22,19 @@ class FinanceOrder(QSqlQueryModel):
     def update(self, percent):
         if percent:
             self.setQuery(f"""
-                            SELECT z2, CAST(ROUND(z3*({float(percent) / 100})) AS INTEGER) as z3 FROM Tp_fv
+                            WITH temp as (SELECT z2, CAST(ROUND(z3*({float(percent) / 100})) AS INTEGER) as z5 FROM Tp_fv)
+                            SELECT z2, z5 from temp
+                            Union All
+                            SELECT 'Итого', SUM(z5)
+                            FROM temp
                             """)
+
 
     def init_update(self):
         self.setQuery(f"""
-                        SELECT z2, z18 as z3 FROM Tp_fv
+                        SELECT z2, z18 as z5 FROM Tp_fv
+                        Union all
+                        SELECT 'Итого', SUM(z18)
+                        FROM Tp_fv
                         """)
+

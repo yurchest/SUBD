@@ -83,10 +83,15 @@ class FilterNir(QWidget):
         self.w_root.comboBox_4.addItem('')
         self.w_root.comboBox_5.addItem('')
 
+        values['region'].sort()
+        values['oblname'].sort()
+        values['city'].sort()
+        values['z2'].sort()
         self.w_root.comboBox_2.addItems(values['region'])
         self.w_root.comboBox_3.addItems(values['oblname'])
         self.w_root.comboBox_4.addItems(values['city'])
         self.w_root.comboBox_5.addItems(values['z2'])
+
 
         for combobox in self.w.findChildren(QComboBox):
             if combobox.count() == 2:

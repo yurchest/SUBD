@@ -129,27 +129,22 @@ class App(QWidget):
             for i, item in enumerate(row):
                 cells[i].text = str(item)
 
-        query = QSqlQuery(f""" SELECT SUM(z3) FROM ({self.finance_order.query().lastQuery()})""")
-        while query.next():
-            summa = query.value(0)
-
-        cells = table.add_row().cells
-        cells[0].text = "Итого"
-        cells[1].text = str(summa)
-
         filename, _ = QFileDialog.getSaveFileName(
-            None, 'Save Doc', os.getcwd(), "*.doc")
+            None, 'Save Doc', os.getcwd())
         if filename:
             document.save(filename)
+        self.w_root.stackedWidget.setCurrentWidget(self.w_root.page_1)
 
     def accept_finance_order(self):
-        print(self.finance_order.query().lastQuery())
+        # print(self.finance_order.query().lastQuery())
         QSqlQuery(f"""UPDATE Tp_fv
-                        SET z18 = table2.z3
+                        SET z18 = table2.z5
                         FROM ({self.finance_order.query().lastQuery()}) AS table2
                         WHERE Tp_fv.z2 = table2.z2""")
         self.fin_vuz_model.update()
         self.set_reference()
+        self.w_root.pushButton_20.setEnabled(False)
+        self.w_root.pushButton_21.setEnabled(True)
 
     def sum_changed(self, text):
         if text:
@@ -168,7 +163,9 @@ class App(QWidget):
                 pass
 
     def open_finance(self):
+        self.w_root.pushButton_21.setEnabled(False)
         self.set_reference()
+        self.w_root.pushButton_20.setEnabled(True)
 
     def set_reference(self):
         sum_plan_fin, sum_fact_fin, percent = self.get_sum_plan_fact_percent()
@@ -179,7 +176,7 @@ class App(QWidget):
 
     def get_sum_plan_fact_percent(self):
         query = QSqlQuery(f"""
-                                SELECT SUM(f18) FROM ({self.nir_model.query().lastQuery()})
+                                SELECT SUM(f18) FROM (SELECT * FROM TP_nir)
                                 """)
         while query.next():
             sum_plan_fin = query.value(0)
@@ -224,7 +221,7 @@ class App(QWidget):
         document.add_paragraph(f"Суммарный объем финансирования: {self.w_root.label_10.text()}")
 
         filename, _ = QFileDialog.getSaveFileName(
-            None, 'Save Doc', os.getcwd(), "*.doc")
+            None, 'Save Doc', os.getcwd())
         if filename:
             document.save(filename)
 
